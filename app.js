@@ -1,0 +1,144 @@
+const KEY = 'bb_tap2earn_save_v1';
+const METRIC_KEY = 'bb_tap2earn_metrics_v1';
+
+const state = load() ?? {
+  coins: 0,
+  tapPower: 1,
+  energy: 100,
+  maxEnergy: 100,
+  lastTick: Date.now()
+};
+
+const el = {
+  coins: document.getElementById('coins'),
+  tapPower: document.getElementById('tapPower'),
+  energy: document.getElementById('energy'),
+  hint: document.getElementById('hint'),
+  tapBtn: document.getElementById('tapBtn'),
+  buyPower: document.getElementById('buyPower'),
+  buyEnergy: document.getElementById('buyEnergy'),
+  reset: document.getElementById('reset'),
+  tabs: document.querySelectorAll('.tab'),
+  panels: document.querySelectorAll('.panel')
+};
+
+function load() {
+  try { return JSON.parse(localStorage.getItem(KEY)); } catch { return null; }
+}
+let dirty = false;
+let hardReset = false;
+function saveNow() {
+  localStorage.setItem(KEY, JSON.stringify(state));
+  dirty = false;
+}
+function markDirty() {
+  dirty = true;
+}
+function fmt(n){ return Math.floor(n).toLocaleString(); }
+
+function track(event, payload = {}) {
+  try {
+    const list = JSON.parse(localStorage.getItem(METRIC_KEY) || '[]');
+    list.push({ event, payload, ts: new Date().toISOString() });
+    if (list.length > 100) list.shift();
+    localStorage.setItem(METRIC_KEY, JSON.stringify(list));
+  } catch {}
+}
+
+function regenEnergy() {
+  const now = Date.now();
+  const deltaSec = (now - state.lastTick) / 1000;
+  state.lastTick = now;
+  if (state.energy < state.maxEnergy) {
+    state.energy = Math.min(state.maxEnergy, state.energy + deltaSec * 3); // 3/sec
+  }
+}
+
+function render() {
+  el.coins.textContent = fmt(state.coins);
+  el.tapPower.textContent = state.tapPower;
+  el.energy.textContent = `${Math.floor(state.energy)}/${state.maxEnergy}`;
+  markDirty();
+}
+
+function flash(msg, cls='ok') {
+  el.hint.className = cls;
+  el.hint.textContent = msg;
+}
+
+el.tapBtn.addEventListener('click', () => {
+  regenEnergy();
+  if (state.energy < 1) {
+    flash('에너지가 부족해요. 잠깐 기다리면 회복됩니다.', 'warn');
+    render();
+    return;
+  }
+  state.energy -= 1;
+  state.coins += state.tapPower;
+  flash(`+${state.tapPower} 코인 획득!`, 'ok');
+  track('tap', { gain: state.tapPower, coins: state.coins });
+  render();
+});
+
+el.buyPower.addEventListener('click', () => {
+  const cost = 50;
+  if (state.coins < cost) {
+    track('upgrade_fail', { type: 'tapPower', cost, coins: state.coins });
+    return flash(`코인이 부족합니다. (${cost} 필요)`, 'warn');
+  }
+  state.coins -= cost;
+  state.tapPower += 1;
+  track('upgrade_success', { type: 'tapPower', level: state.tapPower });
+  flash('Tap Power 업그레이드 완료!');
+  render();
+});
+
+el.buyEnergy.addEventListener('click', () => {
+  const cost = 80;
+  if (state.coins < cost) {
+    track('upgrade_fail', { type: 'maxEnergy', cost, coins: state.coins });
+    return flash(`코인이 부족합니다. (${cost} 필요)`, 'warn');
+  }
+  state.coins -= cost;
+  state.maxEnergy += 20;
+  state.energy = state.maxEnergy;
+  track('upgrade_success', { type: 'maxEnergy', maxEnergy: state.maxEnergy });
+  flash('Max Energy 업그레이드 완료!');
+  render();
+});
+
+el.reset.addEventListener('click', () => {
+  hardReset = true;
+  localStorage.removeItem(KEY);
+  state.coins = 0;
+  state.tapPower = 1;
+  state.energy = 100;
+  state.maxEnergy = 100;
+  state.lastTick = Date.now();
+  dirty = false;
+  location.reload();
+});
+
+el.tabs.forEach(btn => {
+  btn.addEventListener('click', () => {
+    el.tabs.forEach(t => t.classList.remove('active'));
+    el.panels.forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  });
+});
+
+setInterval(() => {
+  regenEnergy();
+  render();
+}, 500);
+
+setInterval(() => {
+  if (dirty) saveNow();
+}, 3000);
+
+window.addEventListener('beforeunload', () => {
+  if (!hardReset && dirty) saveNow();
+});
+
+render();

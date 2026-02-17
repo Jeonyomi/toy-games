@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BB Tap2Earn (Toy)</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <div class="marquee">🎮 BB ARCADE :: TAP • SHIELD • REACTION • ASTRO • WORM</div>
+      <div class="cabinet-deco" aria-hidden="true">
+        <span class="coin-slot"></span>
+      </div>
+      <header class="top">
+        <div class="top-row">
+          <h1><span class="logo-badge">T2E</span> BB Tap2Earn <span class="ver">v3</span></h1>
+          <div class="top-actions" aria-label="quick actions">
+            <button class="icon-btn" aria-label="알림">🔔</button>
+            <button class="icon-btn" aria-label="지갑">👛</button>
+          </div>
+        </div>
+        <p class="sub">팀 toy 프로젝트용 MVP</p>
+      </header>
+
+      <section class="game-picker" aria-label="게임 선택">
+        <span class="picker-label">지금 플레이 중: Tap2Earn</span>
+        <div class="picker-chips" role="navigation" aria-label="game switcher">
+          <a class="chip active" href="./index.html"><span class="ico coin"></span>Tap2Earn</a>
+          <a class="chip" href="./beat-shield/index.html"><span class="ico target"></span>Beat Shield</a>
+          <a class="chip" href="./reaction-dash/index.html"><span class="ico bolt"></span>Reaction Dash</a>
+          <a class="chip" href="./astro-dodge/index.html"><span class="ico rocket"></span>Astro Dodge</a>
+          <a class="chip" href="./worm-tail/index.html"><span class="ico worm"></span>Worm Tail</a>
+        </div>
+      </section>
+
+      <section class="stats">
+        <div><span>코인</span><strong id="coins">0</strong></div>
+        <div><span>탭 보상</span><strong id="tapPower">1</strong></div>
+        <div><span>에너지</span><strong id="energy">100/100</strong></div>
+      </section>
+
+      <nav class="tabs" aria-label="game navigation">
+        <button class="tab active" data-tab="game" aria-controls="game">Game</button>
+        <button class="tab" data-tab="shop" aria-controls="shop">Shop</button>
+      </nav>
+
+      <section id="game" class="panel active">
+        <button id="tapBtn" class="tap-btn">TAP</button>
+        <p id="hint" role="status" aria-live="polite" aria-atomic="true">탭해서 코인을 모으세요.</p>
+      </section>
+
+      <section id="shop" class="panel">
+        <div class="shop-item">
+          <div>
+            <h3>⚡ Tap Power +1</h3>
+            <p>탭당 획득 코인 증가</p>
+          </div>
+          <button id="buyPower">구매 (50)</button>
+        </div>
+        <div class="shop-item">
+          <div>
+            <h3>🔋 Max Energy +20</h3>
+            <p>최대 에너지 증가</p>
+          </div>
+          <button id="buyEnergy">구매 (80)</button>
+        </div>
+      </section>
+
+      <footer>
+        <label class="crt-toggle"><input id="crtToggle" type="checkbox" /> CRT 효과</label>
+        <button id="reset" class="ghost">초기화</button>
+      </footer>
+    </main>
+
+    <script>
+      (function(){
+        const key='bb_arcade_crt';
+        const wrap=document.querySelector('.app');
+        const t=document.getElementById('crtToggle');
+        const on=localStorage.getItem(key)==='1';
+        if(on){wrap.classList.add('crt-on'); t.checked=true;}
+        t.addEventListener('change',()=>{wrap.classList.toggle('crt-on',t.checked); localStorage.setItem(key,t.checked?'1':'0');});
+      })();
+    </script>
+    <script src="app.js"></script>
+  </body>
+</html>

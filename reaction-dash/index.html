@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reaction Dash</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="wrap">
+    <div class="marquee">🎮 BB ARCADE :: REACTION DASH MODE</div>
+    <div class="cabinet-deco" aria-hidden="true"><span class="coin-slot"></span></div>
+    <h1>⚡ Reaction Dash <span class="ver">v1</span></h1>
+    <p class="sub">초록 신호가 뜨면 즉시 탭! 반응속도 게임</p>
+    <section class="game-picker" aria-label="게임 선택">
+      <span class="picker-label">지금 플레이 중: Reaction Dash</span>
+      <div class="picker-chips" role="navigation" aria-label="game switcher">
+        <a class="chip" href="../index.html"><span class="ico coin"></span>Tap2Earn</a>
+        <a class="chip" href="../beat-shield/index.html"><span class="ico target"></span>Beat Shield</a>
+        <a class="chip active" href="./index.html"><span class="ico bolt"></span>Reaction Dash</a>
+        <a class="chip" href="../astro-dodge/index.html"><span class="ico rocket"></span>Astro Dodge</a>
+        <a class="chip" href="../worm-tail/index.html"><span class="ico worm"></span>Worm Tail</a>
+      </div>
+    </section>
+
+    <section class="panel" id="panel">준비되면 START</section>
+    <section class="hud">
+      <div>현재 <strong id="current">-</strong> ms</div>
+      <div>최고(최저) <strong id="best">-</strong> ms</div>
+      <div>시도 <strong id="tries">0</strong></div>
+    </section>
+
+    <button id="start">START</button>
+    <button id="tap" disabled>TAP!</button>
+    <label class="crt-toggle"><input id="crtToggle" type="checkbox" /> CRT 효과</label>
+  </main>
+  <script>
+    (function(){
+      const key='bb_arcade_crt';
+      const wrap=document.querySelector('.wrap');
+      const t=document.getElementById('crtToggle');
+      const on=localStorage.getItem(key)==='1';
+      if(on){wrap.classList.add('crt-on'); t.checked=true;}
+      t.addEventListener('change',()=>{wrap.classList.toggle('crt-on',t.checked); localStorage.setItem(key,t.checked?'1':'0');});
+    })();
+  </script>
+  <script src="game.js"></script>
+</body>
+</html>

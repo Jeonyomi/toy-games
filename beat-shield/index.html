@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0d1020" />
+  <title>Beat Shield (Toy)</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="wrap">
+    <div class="marquee">🎮 BB ARCADE :: BEAT SHIELD MODE</div>
+    <div class="cabinet-deco" aria-hidden="true"><span class="coin-slot"></span></div>
+    <header>
+      <h1>🎯 Beat Shield <span class="ver">v2</span></h1>
+      <p>방향키(← ↑ ↓ →) 또는 버튼으로 코어를 지키세요.</p>
+    </header>
+    <section class="game-picker" aria-label="게임 선택">
+      <span class="picker-label">지금 플레이 중: Beat Shield</span>
+      <div class="picker-chips" role="navigation" aria-label="game switcher">
+        <a class="chip" href="../index.html"><span class="ico coin"></span>Tap2Earn</a>
+        <a class="chip active" href="./index.html"><span class="ico target"></span>Beat Shield</a>
+        <a class="chip" href="../reaction-dash/index.html"><span class="ico bolt"></span>Reaction Dash</a>
+        <a class="chip" href="../astro-dodge/index.html"><span class="ico rocket"></span>Astro Dodge</a>
+        <a class="chip" href="../worm-tail/index.html"><span class="ico worm"></span>Worm Tail</a>
+      </div>
+    </section>
+
+    <section class="hud" aria-label="game stats">
+      <div aria-label="점수">점수 <strong id="score">0</strong></div>
+      <div aria-label="콤보">콤보 <strong id="combo">0</strong></div>
+      <div aria-label="체력">HP <strong id="hp">10</strong></div>
+      <div aria-label="최고점">최고점 <strong id="best">0</strong></div>
+    </section>
+
+    <section id="arena" class="arena">
+      <div class="ring"></div>
+      <div class="core"></div>
+      <div class="lane up" data-dir="up"></div>
+      <div class="lane down" data-dir="down"></div>
+      <div class="lane left" data-dir="left"></div>
+      <div class="lane right" data-dir="right"></div>
+      <div id="judge" class="judge" role="status" aria-live="polite" aria-atomic="true">START를 눌러 시작</div>
+    </section>
+
+    <section class="controls" aria-label="touch-controls">
+      <p id="controlHelp" class="help">링에 맞춰 방향을 눌러 방어하세요.</p>
+      <div class="dpad">
+        <button class="dir up" data-track="input-up" data-input="up" aria-label="up" aria-describedby="controlHelp">↑</button>
+        <button class="dir left" data-track="input-left" data-input="left" aria-label="left" aria-describedby="controlHelp">←</button>
+        <button class="dir down" data-track="input-down" data-input="down" aria-label="down" aria-describedby="controlHelp">↓</button>
+        <button class="dir right" data-track="input-right" data-input="right" aria-label="right" aria-describedby="controlHelp">→</button>
+      </div>
+      <button id="start" aria-describedby="controlHelp" data-track="start">START / RESTART</button>
+    </section>
+    <label class="crt-toggle"><input id="crtToggle" type="checkbox" /> CRT 효과</label>
+  </main>
+
+  <script>
+    (function(){
+      const key='bb_arcade_crt';
+      const wrap=document.querySelector('.wrap');
+      const t=document.getElementById('crtToggle');
+      const on=localStorage.getItem(key)==='1';
+      if(on){wrap.classList.add('crt-on'); t.checked=true;}
+      t.addEventListener('change',()=>{wrap.classList.toggle('crt-on',t.checked); localStorage.setItem(key,t.checked?'1':'0');});
+    })();
+  </script>
+  <script src="game.js"></script>
+</body>
+</html>
