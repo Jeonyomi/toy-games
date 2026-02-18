@@ -3,6 +3,7 @@ const METRIC_KEY = 'bb_tap2earn_metrics_v1';
 
 const state = load() ?? {
   coins: 0,
+  totalCoins: 0,
   tapPower: 1,
   energy: 100,
   maxEnergy: 100,
@@ -13,6 +14,7 @@ const el = {
   coins: document.getElementById('coins'),
   tapPower: document.getElementById('tapPower'),
   energy: document.getElementById('energy'),
+  level: document.getElementById('level'),
   hint: document.getElementById('hint'),
   tapBtn: document.getElementById('tapBtn'),
   buyPower: document.getElementById('buyPower'),
@@ -35,6 +37,9 @@ function markDirty() {
   dirty = true;
 }
 function fmt(n){ return Math.floor(n).toLocaleString(); }
+function getLevel() { return 1 + Math.floor((state.totalCoins || 0) / 200); }
+function getEnergyCost() { return 2 + Math.floor((getLevel() - 1) / 4); }
+function getRegenPerSec() { return Math.max(1.6, 2.6 - (getLevel() - 1) * 0.05); }
 
 function track(event, payload = {}) {
   try {
@@ -50,7 +55,7 @@ function regenEnergy() {
   const deltaSec = (now - state.lastTick) / 1000;
   state.lastTick = now;
   if (state.energy < state.maxEnergy) {
-    state.energy = Math.min(state.maxEnergy, state.energy + deltaSec * 3); // 3/sec
+    state.energy = Math.min(state.maxEnergy, state.energy + deltaSec * getRegenPerSec());
   }
 }
 
@@ -58,6 +63,7 @@ function render() {
   el.coins.textContent = fmt(state.coins);
   el.tapPower.textContent = state.tapPower;
   el.energy.textContent = `${Math.floor(state.energy)}/${state.maxEnergy}`;
+  el.level.textContent = getLevel();
   markDirty();
 }
 
@@ -68,14 +74,16 @@ function flash(msg, cls='ok') {
 
 el.tapBtn.addEventListener('click', () => {
   regenEnergy();
-  if (state.energy < 1) {
+  const energyCost = getEnergyCost();
+  if (state.energy < energyCost) {
     flash('Not enough energy. Wait a moment to recover.', 'warn');
     render();
     return;
   }
-  state.energy -= 1;
+  state.energy -= energyCost;
   state.coins += state.tapPower;
-  flash(`+${state.tapPower} coins earned!`, 'ok');
+  state.totalCoins = (state.totalCoins || 0) + state.tapPower;
+  flash(`+${state.tapPower} coins earned! (-${energyCost}⚡)`, 'ok');
 
   const pop = document.createElement('span');
   pop.className = 'coin-pop';
@@ -118,6 +126,7 @@ el.reset.addEventListener('click', () => {
   hardReset = true;
   localStorage.removeItem(KEY);
   state.coins = 0;
+  state.totalCoins = 0;
   state.tapPower = 1;
   state.energy = 100;
   state.maxEnergy = 100;

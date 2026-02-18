@@ -2,6 +2,7 @@ const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 const scoreEl = document.getElementById('score');
 const bestEl = document.getElementById('best');
+const levelEl = document.getElementById('level');
 const speedEl = document.getElementById('speed');
 const startBtn = document.getElementById('start');
 const leftBtn = document.getElementById('left');
@@ -16,9 +17,14 @@ let ship = { x: W/2, y: H-42, w: 28, h: 18, vx: 0 };
 let rocks = [];
 let particles = [];
 let flash = 0;
+let shieldUntil = 0;
 
-function reset(){ score = 0; t = 0; rocks = []; particles=[]; flash=0; ship.x = W/2; ship.vx = 0; gameOver=false; }
-function spawnRock(){ rocks.push({ x: 20 + Math.random()*(W-40), y: -20, r: 8 + Math.random()*12, vy: 2 + Math.random()*2 + t*0.03 }); }
+function levelFromScore(){ return 1 + Math.floor(score / 180); }
+function speedScale(){ return 1 + (levelFromScore() - 1) * 0.08; }
+function spawnEveryFrames(){ return Math.max(26, 40 - Math.floor((levelFromScore() - 1) * 1.5)); }
+
+function reset(){ score = 0; t = 0; rocks = []; particles=[]; flash=0; ship.x = W/2; ship.vx = 0; gameOver=false; shieldUntil = performance.now() + 1800; }
+function spawnRock(){ rocks.push({ x: 20 + Math.random()*(W-40), y: -20, r: 8 + Math.random()*12, vy: (1.4 + Math.random()*1.4 + t*0.012) * speedScale() }); }
 function hit(a,b){ return Math.abs(a.x-b.x)<(b.r+a.w/2) && Math.abs(a.y-b.y)<(b.r+a.h/2); }
 
 function drawBg(){
@@ -61,7 +67,7 @@ function loop(){
 
   if(running){
     t += 1;
-    if(t%30===0) spawnRock();
+    if(t%spawnEveryFrames()===0) spawnRock();
     ship.x += ship.vx; if(ship.x<16) ship.x=16; if(ship.x>W-16) ship.x=W-16;
 
     rocks.forEach(r=>{ r.y += r.vy; });
@@ -69,6 +75,7 @@ function loop(){
 
     for(const r of rocks){
       if(hit(ship,r)){
+        if(performance.now() < shieldUntil){ continue; }
         running=false; gameOver=true; flash=10; burst(ship.x, ship.y);
         if(score>best){ best=score; localStorage.setItem('bb_astro_best',best); bestEl.textContent=best; }
         startBtn.textContent='RESTART';
@@ -77,12 +84,20 @@ function loop(){
 
     score += 1;
     scoreEl.textContent = score;
-    speedEl.textContent = (1 + t/1200).toFixed(1) + 'x';
+    levelEl.textContent = levelFromScore();
+    speedEl.textContent = speedScale().toFixed(1) + 'x';
   }
 
   drawBg();
   drawRocks();
   if(!gameOver) drawShip();
+  if(running && performance.now() < shieldUntil){
+    ctx.strokeStyle='rgba(127,211,255,.8)';
+    ctx.lineWidth=2;
+    ctx.beginPath();
+    ctx.arc(ship.x, ship.y, 18, 0, Math.PI*2);
+    ctx.stroke();
+  }
   drawParticles();
   if(flash>0){
     ctx.fillStyle=`rgba(255,80,80,${flash/20})`;
