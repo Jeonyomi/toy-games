@@ -1,6 +1,6 @@
-# toy-tab2earn
+# toy-games
 
-간단한 팀 빌딩용 **Tap2Earn** 토이 프로젝트입니다.
+간단한 팀 빌딩용 Play2Earn 토이 프로젝트입니다.
 
 ## 실행
 
@@ -9,7 +9,7 @@
 
 ### 방법 2) 로컬 서버
 ```bash
-cd toy-tab2earn
+cd toy-games
 python -m http.server 8081
 ```
 브라우저에서 `http://localhost:8081`
