@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BB Tap2Earn (Toy)</title>
     <link rel="stylesheet" href="ui-common.css" />
+    <link rel="stylesheet" href="shared-nav.css" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -27,17 +28,6 @@
       <section class="hero-cta" aria-label="Quick start">
         <button id="playRandom" class="cta-primary">Play Random Game</button>
         <button id="browseGames" class="cta-secondary">Browse All Games</button>
-      </section>
-
-      <section id="gamePicker" class="game-picker" aria-label="Game selection">
-        <span class="picker-label">Now playing: Tap2Earn</span>
-        <div class="picker-chips" role="navigation" aria-label="game switcher">
-          <a class="chip active" href="./index.html"><span class="chip-main"><span class="ico coin"></span>Tap2Earn</span><span class="chip-meta">Easy · 2 min · 1P</span></a>
-          <a class="chip" href="./beat-shield/index.html"><span class="chip-main"><span class="ico target"></span>Beat Shield</span><span class="chip-meta">Medium · 3 min · 1P</span></a>
-          <a class="chip" href="./reaction-dash/index.html"><span class="chip-main"><span class="ico bolt"></span>Reaction Dash</span><span class="chip-meta">Easy · 1 min · 1P</span></a>
-          <a class="chip" href="./astro-dodge/index.html"><span class="chip-main"><span class="ico rocket"></span>Astro Dodge</span><span class="chip-meta">Medium · 2 min · 1P</span></a>
-          <a class="chip" href="./worm-tail/index.html"><span class="chip-main"><span class="ico worm"></span>Worm Tail</span><span class="chip-meta">Medium · 4 min · 1P</span></a>
-        </div>
       </section>
 
       <nav class="universal-actions" aria-label="Universal game actions">
@@ -107,18 +97,12 @@
         if(on){wrap.classList.add('crt-on'); t.checked=true;}
         t.addEventListener('change',()=>{wrap.classList.toggle('crt-on',t.checked); localStorage.setItem(key,t.checked?'1':'0');});
 
-        document.getElementById('browseGames').addEventListener('click',()=>{
-          document.getElementById('gamePicker').scrollIntoView({behavior:'smooth', block:'start'});
-        });
+        document.getElementById('browseGames').addEventListener('click',()=>window.arcadeMenu?.open());
 
         const links=['./beat-shield/index.html','./reaction-dash/index.html','./astro-dodge/index.html','./worm-tail/index.html','./index.html'];
         document.getElementById('playRandom').addEventListener('click',()=>{
           const pick=links[Math.floor(Math.random()*links.length)];
           location.href=pick;
-        });
-
-        document.querySelector('[data-action="change-game"]').addEventListener('click',()=>{
-          document.getElementById('gamePicker').scrollIntoView({behavior:'smooth', block:'start'});
         });
 
         document.getElementById('restartPage').addEventListener('click',()=>location.reload());
@@ -131,6 +115,7 @@
         document.getElementById('dontShowHowto').addEventListener('click',()=>{localStorage.setItem(helpKey,'1');hide();});
       })();
     </script>
+    <script src="shared-nav.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

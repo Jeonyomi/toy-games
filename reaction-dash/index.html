@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Reaction Dash</title>
   <link rel="stylesheet" href="../ui-common.css" />
+  <link rel="stylesheet" href="../shared-nav.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -13,17 +14,6 @@
     <div class="cabinet-deco" aria-hidden="true"><span class="coin-slot"></span></div>
     <h1>⚡ Reaction Dash <span class="ver">v1</span></h1>
     <p class="sub">Tap instantly when the green signal appears! Reaction speed game.</p>
-    <section id="gamePicker" class="game-picker" aria-label="Game selection">
-      <span class="picker-label">Now playing: Reaction Dash</span>
-      <div class="picker-chips" role="navigation" aria-label="game switcher">
-        <a class="chip" href="../index.html"><span class="chip-main"><span class="ico coin"></span>Tap2Earn</span><span class="chip-meta">Easy · 2 min · 1P</span></a>
-        <a class="chip" href="../beat-shield/index.html"><span class="chip-main"><span class="ico target"></span>Beat Shield</span><span class="chip-meta">Medium · 3 min · 1P</span></a>
-        <a class="chip active" href="./index.html"><span class="chip-main"><span class="ico bolt"></span>Reaction Dash</span><span class="chip-meta">Easy · 1 min · 1P</span></a>
-        <a class="chip" href="../astro-dodge/index.html"><span class="chip-main"><span class="ico rocket"></span>Astro Dodge</span><span class="chip-meta">Medium · 2 min · 1P</span></a>
-        <a class="chip" href="../worm-tail/index.html"><span class="chip-main"><span class="ico worm"></span>Worm Tail</span><span class="chip-meta">Medium · 4 min · 1P</span></a>
-      </div>
-    </section>
-
     <nav class="universal-actions" aria-label="Universal game actions">
       <a class="ua-btn" href="../index.html">Home</a>
       <button class="ua-btn" type="button" data-action="change-game">Change Game</button>
@@ -64,9 +54,6 @@
       if(on){wrap.classList.add('crt-on'); t.checked=true;}
       t.addEventListener('change',()=>{wrap.classList.toggle('crt-on',t.checked); localStorage.setItem(key,t.checked?'1':'0');});
 
-      document.querySelector('[data-action="change-game"]').addEventListener('click',()=>{
-        document.getElementById('gamePicker').scrollIntoView({behavior:'smooth', block:'start'});
-      });
       document.getElementById('restartPage').addEventListener('click',()=>location.reload());
 
       const helpKey='bb_howto_seen_reaction_dash';
@@ -77,6 +64,7 @@
       document.getElementById('dontShowHowto').addEventListener('click',()=>{localStorage.setItem(helpKey,'1');hide();});
     })();
   </script>
+  <script src="../shared-nav.js"></script>
   <script src="game.js"></script>
 </body>
 </html>

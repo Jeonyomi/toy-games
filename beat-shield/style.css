@@ -80,3 +80,6 @@ button:focus-visible{outline:3px solid #9cb0ff;outline-offset:2px}
 .howto-actions .ghost-btn{background:transparent;border-color:#6074d6;color:#c8d6ff}
 
 @media (max-width:420px){.howto-actions{grid-template-columns:1fr}}
+
+body{display:block;min-height:100dvh;padding:calc(10px + env(safe-area-inset-top)) calc(10px + env(safe-area-inset-right)) calc(14px + env(safe-area-inset-bottom)) calc(10px + env(safe-area-inset-left))}
+.wrap{height:auto;max-height:none;min-height:min(820px,calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 24px));margin:0 auto}

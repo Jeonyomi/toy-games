@@ -42,3 +42,6 @@ button{min-height:48px;border-radius:12px;border:1px solid #2dc79a;background:#1
 .howto-actions .ghost-btn{background:transparent;border-color:#33b993;color:#c7ffe7}
 
 @media (max-width:420px){.howto-actions{grid-template-columns:1fr}}
+
+body{display:block;min-height:100dvh;padding:calc(10px + env(safe-area-inset-top)) calc(10px + env(safe-area-inset-right)) calc(14px + env(safe-area-inset-bottom)) calc(10px + env(safe-area-inset-left))}
+.wrap{height:auto;max-height:none;min-height:min(820px,calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 24px));margin:0 auto}
