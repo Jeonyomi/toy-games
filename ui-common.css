@@ -1,0 +1,7 @@
+.chip{display:inline-flex;flex-direction:column;align-items:flex-start;gap:2px;line-height:1.05}.chip-main{display:inline-flex;align-items:center;gap:6px}.chip-meta{font-size:.68rem;color:#9ad2c3}
+.universal-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.ua-btn{display:flex;align-items:center;justify-content:center;text-decoration:none;padding:10px;border-radius:10px;border:1px solid #1b5f4d;background:#103329;color:#eafff7;font-size:.85rem;font-weight:700;cursor:pointer}
+.howto-overlay{position:fixed;inset:0;background:rgba(2,11,8,.78);display:grid;place-items:center;padding:16px;z-index:50}
+.howto-overlay.hidden{display:none}.howto-card{max-width:360px;background:#103329;border:1px solid #2ac799;border-radius:14px;padding:14px}.howto-card h2{margin:0 0 8px}.howto-card p{margin:0 0 8px;color:#b7e9da;font-size:.9rem}
+.howto-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.howto-actions button{padding:10px;border-radius:10px;border:1px solid #2ac799;background:#165140;color:#eafff7;font-weight:700;cursor:pointer}.howto-actions .ghost-btn{background:transparent;border-color:#3a7867;color:#c5f4e6}
+@media (max-width:420px){.howto-actions{grid-template-columns:1fr}}

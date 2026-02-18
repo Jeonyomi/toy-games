@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BB Tap2Earn (Toy)</title>
+    <link rel="stylesheet" href="ui-common.css" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -23,16 +24,27 @@
         <p class="sub">MVP for team-building toy games</p>
       </header>
 
-      <section class="game-picker" aria-label="Game selection">
+      <section class="hero-cta" aria-label="Quick start">
+        <button id="playRandom" class="cta-primary">Play Random Game</button>
+        <button id="browseGames" class="cta-secondary">Browse All Games</button>
+      </section>
+
+      <section id="gamePicker" class="game-picker" aria-label="Game selection">
         <span class="picker-label">Now playing: Tap2Earn</span>
         <div class="picker-chips" role="navigation" aria-label="game switcher">
-          <a class="chip active" href="./index.html"><span class="ico coin"></span>Tap2Earn</a>
-          <a class="chip" href="./beat-shield/index.html"><span class="ico target"></span>Beat Shield</a>
-          <a class="chip" href="./reaction-dash/index.html"><span class="ico bolt"></span>Reaction Dash</a>
-          <a class="chip" href="./astro-dodge/index.html"><span class="ico rocket"></span>Astro Dodge</a>
-          <a class="chip" href="./worm-tail/index.html"><span class="ico worm"></span>Worm Tail</a>
+          <a class="chip active" href="./index.html"><span class="chip-main"><span class="ico coin"></span>Tap2Earn</span><span class="chip-meta">Easy · 2 min · 1P</span></a>
+          <a class="chip" href="./beat-shield/index.html"><span class="chip-main"><span class="ico target"></span>Beat Shield</span><span class="chip-meta">Medium · 3 min · 1P</span></a>
+          <a class="chip" href="./reaction-dash/index.html"><span class="chip-main"><span class="ico bolt"></span>Reaction Dash</span><span class="chip-meta">Easy · 1 min · 1P</span></a>
+          <a class="chip" href="./astro-dodge/index.html"><span class="chip-main"><span class="ico rocket"></span>Astro Dodge</span><span class="chip-meta">Medium · 2 min · 1P</span></a>
+          <a class="chip" href="./worm-tail/index.html"><span class="chip-main"><span class="ico worm"></span>Worm Tail</span><span class="chip-meta">Medium · 4 min · 1P</span></a>
         </div>
       </section>
+
+      <nav class="universal-actions" aria-label="Universal game actions">
+        <a class="ua-btn" href="./index.html">Home</a>
+        <button class="ua-btn" type="button" data-action="change-game">Change Game</button>
+        <button id="restartPage" class="ua-btn" type="button">Restart</button>
+      </nav>
 
       <section class="stats">
         <div><span>Coins</span><strong id="coins">0</strong></div>
@@ -68,19 +80,55 @@
       </section>
 
       <footer>
-        <label class="crt-toggle"><input id="crtToggle" type="checkbox" /> CRT effect</label>
+        <label class="crt-toggle"><input id="crtToggle" type="checkbox" /> CRT Effect (Visual Only)</label>
         <button id="reset" class="ghost">Reset</button>
       </footer>
     </main>
+
+    <aside id="howtoOverlay" class="howto-overlay" role="dialog" aria-modal="true" aria-labelledby="howtoTitle">
+      <div class="howto-card">
+        <h2 id="howtoTitle">How to play Tap2Earn</h2>
+        <p>Tap the big button to earn coins. Spend coins in Shop to upgrade power and max energy.</p>
+        <p>Energy regenerates over time, so short sessions are best.</p>
+        <div class="howto-actions">
+          <button id="dismissHowto" type="button">Got it</button>
+          <button id="dontShowHowto" type="button" class="ghost-btn">Don't show again</button>
+        </div>
+      </div>
+    </aside>
 
     <script>
       (function(){
         const key='bb_arcade_crt';
         const wrap=document.querySelector('.app');
         const t=document.getElementById('crtToggle');
-        const on=localStorage.getItem(key)==='1';
+        const saved=localStorage.getItem(key);
+        const on=saved==='1';
         if(on){wrap.classList.add('crt-on'); t.checked=true;}
         t.addEventListener('change',()=>{wrap.classList.toggle('crt-on',t.checked); localStorage.setItem(key,t.checked?'1':'0');});
+
+        document.getElementById('browseGames').addEventListener('click',()=>{
+          document.getElementById('gamePicker').scrollIntoView({behavior:'smooth', block:'start'});
+        });
+
+        const links=['./beat-shield/index.html','./reaction-dash/index.html','./astro-dodge/index.html','./worm-tail/index.html','./index.html'];
+        document.getElementById('playRandom').addEventListener('click',()=>{
+          const pick=links[Math.floor(Math.random()*links.length)];
+          location.href=pick;
+        });
+
+        document.querySelector('[data-action="change-game"]').addEventListener('click',()=>{
+          document.getElementById('gamePicker').scrollIntoView({behavior:'smooth', block:'start'});
+        });
+
+        document.getElementById('restartPage').addEventListener('click',()=>location.reload());
+
+        const helpKey='bb_howto_seen_tap2earn';
+        const overlay=document.getElementById('howtoOverlay');
+        const hide=()=>overlay.classList.add('hidden');
+        if(localStorage.getItem(helpKey)==='1') hide();
+        document.getElementById('dismissHowto').addEventListener('click',hide);
+        document.getElementById('dontShowHowto').addEventListener('click',()=>{localStorage.setItem(helpKey,'1');hide();});
       })();
     </script>
     <script src="app.js"></script>

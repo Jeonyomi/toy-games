@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Reaction Dash</title>
+  <link rel="stylesheet" href="../ui-common.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -12,16 +13,22 @@
     <div class="cabinet-deco" aria-hidden="true"><span class="coin-slot"></span></div>
     <h1>⚡ Reaction Dash <span class="ver">v1</span></h1>
     <p class="sub">Tap instantly when the green signal appears! Reaction speed game.</p>
-    <section class="game-picker" aria-label="Game selection">
+    <section id="gamePicker" class="game-picker" aria-label="Game selection">
       <span class="picker-label">Now playing: Reaction Dash</span>
       <div class="picker-chips" role="navigation" aria-label="game switcher">
-        <a class="chip" href="../index.html"><span class="ico coin"></span>Tap2Earn</a>
-        <a class="chip" href="../beat-shield/index.html"><span class="ico target"></span>Beat Shield</a>
-        <a class="chip active" href="./index.html"><span class="ico bolt"></span>Reaction Dash</a>
-        <a class="chip" href="../astro-dodge/index.html"><span class="ico rocket"></span>Astro Dodge</a>
-        <a class="chip" href="../worm-tail/index.html"><span class="ico worm"></span>Worm Tail</a>
+        <a class="chip" href="../index.html"><span class="chip-main"><span class="ico coin"></span>Tap2Earn</span><span class="chip-meta">Easy · 2 min · 1P</span></a>
+        <a class="chip" href="../beat-shield/index.html"><span class="chip-main"><span class="ico target"></span>Beat Shield</span><span class="chip-meta">Medium · 3 min · 1P</span></a>
+        <a class="chip active" href="./index.html"><span class="chip-main"><span class="ico bolt"></span>Reaction Dash</span><span class="chip-meta">Easy · 1 min · 1P</span></a>
+        <a class="chip" href="../astro-dodge/index.html"><span class="chip-main"><span class="ico rocket"></span>Astro Dodge</span><span class="chip-meta">Medium · 2 min · 1P</span></a>
+        <a class="chip" href="../worm-tail/index.html"><span class="chip-main"><span class="ico worm"></span>Worm Tail</span><span class="chip-meta">Medium · 4 min · 1P</span></a>
       </div>
     </section>
+
+    <nav class="universal-actions" aria-label="Universal game actions">
+      <a class="ua-btn" href="../index.html">Home</a>
+      <button class="ua-btn" type="button" data-action="change-game">Change Game</button>
+      <button id="restartPage" class="ua-btn" type="button">Restart</button>
+    </nav>
 
     <section class="panel" id="panel">Press START when ready</section>
     <section class="hud">
@@ -32,16 +39,42 @@
 
     <button id="start">START</button>
     <button id="tap" disabled>TAP!</button>
-    <label class="crt-toggle"><input id="crtToggle" type="checkbox" /> CRT effect</label>
+    <label class="crt-toggle"><input id="crtToggle" type="checkbox" /> CRT Effect (Visual Only)</label>
   </main>
+
+  <aside id="howtoOverlay" class="howto-overlay" role="dialog" aria-modal="true" aria-labelledby="howtoTitle">
+    <div class="howto-card">
+      <h2 id="howtoTitle">How to play Reaction Dash</h2>
+      <p>Press START, wait for green signal, then tap fast.</p>
+      <p>Tapping too early fails the round and you need to start again.</p>
+      <div class="howto-actions">
+        <button id="dismissHowto" type="button">Got it</button>
+        <button id="dontShowHowto" type="button" class="ghost-btn">Don't show again</button>
+      </div>
+    </div>
+  </aside>
+
   <script>
     (function(){
       const key='bb_arcade_crt';
       const wrap=document.querySelector('.wrap');
       const t=document.getElementById('crtToggle');
-      const on=localStorage.getItem(key)==='1';
+      const saved=localStorage.getItem(key);
+      const on=saved==='1';
       if(on){wrap.classList.add('crt-on'); t.checked=true;}
       t.addEventListener('change',()=>{wrap.classList.toggle('crt-on',t.checked); localStorage.setItem(key,t.checked?'1':'0');});
+
+      document.querySelector('[data-action="change-game"]').addEventListener('click',()=>{
+        document.getElementById('gamePicker').scrollIntoView({behavior:'smooth', block:'start'});
+      });
+      document.getElementById('restartPage').addEventListener('click',()=>location.reload());
+
+      const helpKey='bb_howto_seen_reaction_dash';
+      const overlay=document.getElementById('howtoOverlay');
+      const hide=()=>overlay.classList.add('hidden');
+      if(localStorage.getItem(helpKey)==='1') hide();
+      document.getElementById('dismissHowto').addEventListener('click',hide);
+      document.getElementById('dontShowHowto').addEventListener('click',()=>{localStorage.setItem(helpKey,'1');hide();});
     })();
   </script>
   <script src="game.js"></script>
