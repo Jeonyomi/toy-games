@@ -21,18 +21,18 @@ startBtn.addEventListener('click', () => {
   clearTimeout(timer);
   waiting = true;
   tapBtn.disabled = false;
-  setPanel('기다리세요... (성급 탭 금지)', 'wait');
+  setPanel('Wait... (no early tap)', 'wait');
   const delay = 1200 + Math.random()*2500;
   timer = setTimeout(() => {
     waiting = false;
     goAt = performance.now();
-    setPanel('지금 탭!', 'go');
+    setPanel('TAP NOW!', 'go');
   }, delay);
 });
 
 tapBtn.addEventListener('click', () => {
   if(waiting){
-    setPanel('너무 빨라요! 다시 START', 'bad');
+    setPanel('Too early! Press START again', 'bad');
     pulse('shake');
     if (navigator.vibrate) navigator.vibrate([20,30,20]);
     tapBtn.disabled = true;
@@ -42,7 +42,7 @@ tapBtn.addEventListener('click', () => {
   const rt = Math.round(performance.now() - goAt);
   tries++; triesEl.textContent = tries; currentEl.textContent = rt;
   if(!best || rt < best){ best = rt; localStorage.setItem('bb_reaction_best', String(best)); bestEl.textContent = best; }
-  setPanel(`반응속도 ${rt}ms`, '');
+  setPanel(`Reaction time ${rt}ms`, '');
   pulse('hit');
   if (navigator.vibrate) navigator.vibrate(12);
   goAt = 0;

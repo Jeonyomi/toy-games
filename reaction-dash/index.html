@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,9 +11,9 @@
     <div class="marquee">🎮 BB ARCADE :: REACTION DASH MODE</div>
     <div class="cabinet-deco" aria-hidden="true"><span class="coin-slot"></span></div>
     <h1>⚡ Reaction Dash <span class="ver">v1</span></h1>
-    <p class="sub">초록 신호가 뜨면 즉시 탭! 반응속도 게임</p>
-    <section class="game-picker" aria-label="게임 선택">
-      <span class="picker-label">지금 플레이 중: Reaction Dash</span>
+    <p class="sub">Tap instantly when the green signal appears! Reaction speed game.</p>
+    <section class="game-picker" aria-label="Game selection">
+      <span class="picker-label">Now playing: Reaction Dash</span>
       <div class="picker-chips" role="navigation" aria-label="game switcher">
         <a class="chip" href="../index.html"><span class="ico coin"></span>Tap2Earn</a>
         <a class="chip" href="../beat-shield/index.html"><span class="ico target"></span>Beat Shield</a>
@@ -23,16 +23,16 @@
       </div>
     </section>
 
-    <section class="panel" id="panel">준비되면 START</section>
+    <section class="panel" id="panel">Press START when ready</section>
     <section class="hud">
-      <div>현재 <strong id="current">-</strong> ms</div>
-      <div>최고(최저) <strong id="best">-</strong> ms</div>
-      <div>시도 <strong id="tries">0</strong></div>
+      <div>Current <strong id="current">-</strong> ms</div>
+      <div>Best <strong id="best">-</strong> ms</div>
+      <div>Tries <strong id="tries">0</strong></div>
     </section>
 
     <button id="start">START</button>
     <button id="tap" disabled>TAP!</button>
-    <label class="crt-toggle"><input id="crtToggle" type="checkbox" /> CRT 효과</label>
+    <label class="crt-toggle"><input id="crtToggle" type="checkbox" /> CRT effect</label>
   </main>
   <script>
     (function(){

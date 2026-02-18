@@ -90,7 +90,7 @@ function checkGameOver(){
     arena.classList.add('game-over');
     setTimeout(()=>arena.classList.remove('game-over'), 800);
     if (navigator.vibrate) navigator.vibrate([30,50,30]);
-    announce('💥 GAME OVER — START로 재시작', 'bad');
+    announce('💥 GAME OVER — press START to retry', 'bad');
     track('game_over', { score, comboPeak });
   }
 }
@@ -120,7 +120,7 @@ function start(){
   enemies=[]; score=0; combo=0; hp=10; elapsed=0; spawnAcc=0; last=0; running=true;
   comboPeak = 0;
   updateHUD();
-  announce('집중! 링 구간에서 입력', 'ok');
+  announce('Focus! Input at ring timing.', 'ok');
   track('game_start');
   requestAnimationFrame(loop);
 }
@@ -142,7 +142,7 @@ document.addEventListener('visibilitychange', () => {
   if (document.hidden && running) {
     running = false;
     pausedByHidden = true;
-    announce('⏸️ 일시정지됨 (탭 복귀 후 START)', 'warn');
+    announce('⏸️ Paused (press START after returning)', 'warn');
   }
 });
 

@@ -1,21 +1,21 @@
 # toy-games
 
-간단한 팀 빌딩용 Play2Earn 토이 프로젝트입니다.
+A simple team-building Play2Earn toy project.
 
-## 실행
+## Run
 
-### 방법 1) 파일 바로 열기
-- `index.html` 더블클릭
+### Option 1) Open file directly
+- Double-click `index.html`
 
-### 방법 2) 로컬 서버
+### Option 2) Local server
 ```bash
 cd toy-games
 python -m http.server 8081
 ```
-브라우저에서 `http://localhost:8081`
+Open `http://localhost:8081` in your browser.
 
-## 기능
-- TAP 버튼으로 코인 획득
-- 에너지 소모/자동 회복
-- Shop 탭 업그레이드 2종
-- localStorage 저장 (새로고침 후 유지)
+## Features
+- Earn coins by tapping
+- Energy consumption and auto-recovery
+- Two shop upgrades
+- Progress saved with localStorage

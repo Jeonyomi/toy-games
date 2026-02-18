@@ -69,13 +69,13 @@ function flash(msg, cls='ok') {
 el.tapBtn.addEventListener('click', () => {
   regenEnergy();
   if (state.energy < 1) {
-    flash('에너지가 부족해요. 잠깐 기다리면 회복됩니다.', 'warn');
+    flash('Not enough energy. Wait a moment to recover.', 'warn');
     render();
     return;
   }
   state.energy -= 1;
   state.coins += state.tapPower;
-  flash(`+${state.tapPower} 코인 획득!`, 'ok');
+  flash(`+${state.tapPower} coins earned!`, 'ok');
 
   const pop = document.createElement('span');
   pop.className = 'coin-pop';
@@ -91,12 +91,12 @@ el.buyPower.addEventListener('click', () => {
   const cost = 50;
   if (state.coins < cost) {
     track('upgrade_fail', { type: 'tapPower', cost, coins: state.coins });
-    return flash(`코인이 부족합니다. (${cost} 필요)`, 'warn');
+    return flash(`Not enough coins. (${cost} needed)`, 'warn');
   }
   state.coins -= cost;
   state.tapPower += 1;
   track('upgrade_success', { type: 'tapPower', level: state.tapPower });
-  flash('Tap Power 업그레이드 완료!');
+  flash('Tap Power upgraded!');
   render();
 });
 
@@ -104,13 +104,13 @@ el.buyEnergy.addEventListener('click', () => {
   const cost = 80;
   if (state.coins < cost) {
     track('upgrade_fail', { type: 'maxEnergy', cost, coins: state.coins });
-    return flash(`코인이 부족합니다. (${cost} 필요)`, 'warn');
+    return flash(`Not enough coins. (${cost} needed)`, 'warn');
   }
   state.coins -= cost;
   state.maxEnergy += 20;
   state.energy = state.maxEnergy;
   track('upgrade_success', { type: 'maxEnergy', maxEnergy: state.maxEnergy });
-  flash('Max Energy 업그레이드 완료!');
+  flash('Max Energy upgraded!');
   render();
 });
 

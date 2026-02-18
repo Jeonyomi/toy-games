@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,10 +13,10 @@
     <div class="cabinet-deco" aria-hidden="true"><span class="coin-slot"></span></div>
     <header>
       <h1>🎯 Beat Shield <span class="ver">v2</span></h1>
-      <p>방향키(← ↑ ↓ →) 또는 버튼으로 코어를 지키세요.</p>
+      <p>Defend the core with arrow keys (← ↑ ↓ →) or buttons.</p>
     </header>
-    <section class="game-picker" aria-label="게임 선택">
-      <span class="picker-label">지금 플레이 중: Beat Shield</span>
+    <section class="game-picker" aria-label="Game selection">
+      <span class="picker-label">Now playing: Beat Shield</span>
       <div class="picker-chips" role="navigation" aria-label="game switcher">
         <a class="chip" href="../index.html"><span class="ico coin"></span>Tap2Earn</a>
         <a class="chip active" href="./index.html"><span class="ico target"></span>Beat Shield</a>
@@ -27,10 +27,10 @@
     </section>
 
     <section class="hud" aria-label="game stats">
-      <div aria-label="점수">점수 <strong id="score">0</strong></div>
-      <div aria-label="콤보">콤보 <strong id="combo">0</strong></div>
-      <div aria-label="체력">HP <strong id="hp">10</strong></div>
-      <div aria-label="최고점">최고점 <strong id="best">0</strong></div>
+      <div aria-label="Score">Score <strong id="score">0</strong></div>
+      <div aria-label="Combo">Combo <strong id="combo">0</strong></div>
+      <div aria-label="HP">HP <strong id="hp">10</strong></div>
+      <div aria-label="Best">Best <strong id="best">0</strong></div>
     </section>
 
     <section id="arena" class="arena">
@@ -40,11 +40,11 @@
       <div class="lane down" data-dir="down"></div>
       <div class="lane left" data-dir="left"></div>
       <div class="lane right" data-dir="right"></div>
-      <div id="judge" class="judge" role="status" aria-live="polite" aria-atomic="true">START를 눌러 시작</div>
+      <div id="judge" class="judge" role="status" aria-live="polite" aria-atomic="true">Press START to begin</div>
     </section>
 
     <section class="controls" aria-label="touch-controls">
-      <p id="controlHelp" class="help">링에 맞춰 방향을 눌러 방어하세요.</p>
+      <p id="controlHelp" class="help">Hit directions near the ring timing to defend.</p>
       <div class="dpad">
         <button class="dir up" data-track="input-up" data-input="up" aria-label="up" aria-describedby="controlHelp">↑</button>
         <button class="dir left" data-track="input-left" data-input="left" aria-label="left" aria-describedby="controlHelp">←</button>
@@ -53,7 +53,7 @@
       </div>
       <button id="start" aria-describedby="controlHelp" data-track="start">START / RESTART</button>
     </section>
-    <label class="crt-toggle"><input id="crtToggle" type="checkbox" /> CRT 효과</label>
+    <label class="crt-toggle"><input id="crtToggle" type="checkbox" /> CRT effect</label>
   </main>
 
   <script>

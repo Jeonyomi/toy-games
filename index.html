@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -16,15 +16,15 @@
         <div class="top-row">
           <h1><span class="logo-badge">T2E</span> BB Tap2Earn <span class="ver">v3</span></h1>
           <div class="top-actions" aria-label="quick actions">
-            <button class="icon-btn" aria-label="알림">🔔</button>
-            <button class="icon-btn" aria-label="지갑">👛</button>
+            <button class="icon-btn" aria-label="Notifications">🔔</button>
+            <button class="icon-btn" aria-label="Wallet">👛</button>
           </div>
         </div>
-        <p class="sub">팀 toy 프로젝트용 MVP</p>
+        <p class="sub">MVP for team-building toy games</p>
       </header>
 
-      <section class="game-picker" aria-label="게임 선택">
-        <span class="picker-label">지금 플레이 중: Tap2Earn</span>
+      <section class="game-picker" aria-label="Game selection">
+        <span class="picker-label">Now playing: Tap2Earn</span>
         <div class="picker-chips" role="navigation" aria-label="game switcher">
           <a class="chip active" href="./index.html"><span class="ico coin"></span>Tap2Earn</a>
           <a class="chip" href="./beat-shield/index.html"><span class="ico target"></span>Beat Shield</a>
@@ -35,9 +35,9 @@
       </section>
 
       <section class="stats">
-        <div><span>코인</span><strong id="coins">0</strong></div>
-        <div><span>탭 보상</span><strong id="tapPower">1</strong></div>
-        <div><span>에너지</span><strong id="energy">100/100</strong></div>
+        <div><span>Coins</span><strong id="coins">0</strong></div>
+        <div><span>Tap reward</span><strong id="tapPower">1</strong></div>
+        <div><span>Energy</span><strong id="energy">100/100</strong></div>
       </section>
 
       <nav class="tabs" aria-label="game navigation">
@@ -47,29 +47,29 @@
 
       <section id="game" class="panel active">
         <button id="tapBtn" class="tap-btn">TAP</button>
-        <p id="hint" role="status" aria-live="polite" aria-atomic="true">탭해서 코인을 모으세요.</p>
+        <p id="hint" role="status" aria-live="polite" aria-atomic="true">Tap to earn coins.</p>
       </section>
 
       <section id="shop" class="panel">
         <div class="shop-item">
           <div>
             <h3>⚡ Tap Power +1</h3>
-            <p>탭당 획득 코인 증가</p>
+            <p>Increase coins per tap</p>
           </div>
-          <button id="buyPower">구매 (50)</button>
+          <button id="buyPower">Buy (50)</button>
         </div>
         <div class="shop-item">
           <div>
             <h3>🔋 Max Energy +20</h3>
-            <p>최대 에너지 증가</p>
+            <p>Increase max energy</p>
           </div>
-          <button id="buyEnergy">구매 (80)</button>
+          <button id="buyEnergy">Buy (80)</button>
         </div>
       </section>
 
       <footer>
-        <label class="crt-toggle"><input id="crtToggle" type="checkbox" /> CRT 효과</label>
-        <button id="reset" class="ghost">초기화</button>
+        <label class="crt-toggle"><input id="crtToggle" type="checkbox" /> CRT effect</label>
+        <button id="reset" class="ghost">Reset</button>
       </footer>
     </main>
 

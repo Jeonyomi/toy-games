@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,10 +11,10 @@
     <div class="marquee">🎮 BB ARCADE :: ASTRO DODGE MODE</div>
     <div class="cabinet-deco" aria-hidden="true"><span class="coin-slot"></span></div>
     <h1>🚀 Astro Dodge <span class="ver">v1</span></h1>
-    <p class="sub">좌우로 피해서 오래 버티기 (그래픽 Canvas)</p>
+    <p class="sub">Dodge left and right to survive longer (Canvas graphics)</p>
 
-    <section class="game-picker" aria-label="게임 선택">
-      <span class="picker-label">지금 플레이 중: Astro Dodge</span>
+    <section class="game-picker" aria-label="Game selection">
+      <span class="picker-label">Now playing: Astro Dodge</span>
       <div class="picker-chips" role="navigation" aria-label="game switcher">
         <a class="chip" href="../index.html"><span class="ico coin"></span>Tap2Earn</a>
         <a class="chip" href="../beat-shield/index.html"><span class="ico target"></span>Beat Shield</a>
@@ -25,9 +25,9 @@
     </section>
 
     <section class="hud">
-      <div>점수 <strong id="score">0</strong></div>
-      <div>최고점 <strong id="best">0</strong></div>
-      <div>속도 <strong id="speed">1.0x</strong></div>
+      <div>Score <strong id="score">0</strong></div>
+      <div>Best <strong id="best">0</strong></div>
+      <div>Speed <strong id="speed">1.0x</strong></div>
     </section>
 
     <canvas id="game" width="360" height="520"></canvas>
@@ -36,7 +36,7 @@
       <button id="start">START</button>
       <button id="right">▶</button>
     </div>
-    <label class="crt-toggle"><input id="crtToggle" type="checkbox" /> CRT 효과</label>
+    <label class="crt-toggle"><input id="crtToggle" type="checkbox" /> CRT effect</label>
   </main>
   <script>
     (function(){
