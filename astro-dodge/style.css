@@ -24,3 +24,21 @@ h1{margin:0 0 4px}.sub{margin:0;color:var(--muted)}.ver{font-size:.65rem;padding
 canvas{width:100%;height:auto;border-radius:12px;border:1px solid #2a4b79;background:#060f1d;display:block}
 .controls{display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:8px;margin-top:8px}
 button{min-height:48px;border-radius:12px;border:1px solid #4a75b8;background:#244a82;color:#fff;font-weight:800}
+
+.chip{display:flex;flex-direction:column;align-items:flex-start;gap:2px;line-height:1.1;min-width:128px;border-radius:14px;white-space:normal}
+.chip-main{display:inline-flex;align-items:center;gap:6px;font-weight:700}
+.chip-meta{font-size:.68rem;color:var(--muted)}
+
+.universal-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0}
+.ua-btn{display:flex;align-items:center;justify-content:center;text-decoration:none;padding:10px;border-radius:10px;border:1px solid #335b94;background:#17345c;color:var(--text);font-size:.85rem;font-weight:700;cursor:pointer}
+
+.howto-overlay{position:fixed;inset:0;background:rgba(2,8,18,.78);display:grid;place-items:center;padding:16px;z-index:50}
+.howto-overlay.hidden{display:none}
+.howto-card{width:min(390px,92vw);background:#122642;border:1px solid #4f77b3;border-radius:14px;padding:14px}
+.howto-card h2{margin:0 0 8px;font-size:1.1rem}
+.howto-card p{margin:0 0 8px;color:var(--muted);font-size:.9rem}
+.howto-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.howto-actions button{border-radius:10px;border:1px solid #4a75b8;background:#244a82;color:#fff;padding:10px;cursor:pointer}
+.howto-actions .ghost-btn{background:transparent;border-color:#5f8ed0;color:#d1e4ff}
+
+@media (max-width:420px){.howto-actions{grid-template-columns:1fr}}
