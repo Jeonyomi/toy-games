@@ -13,7 +13,7 @@ h1{margin:0 0 4px}.sub{margin:0;color:var(--muted)}.ver{font-size:.65rem;padding
 .ico.target{background:radial-gradient(circle at 50% 50%,#fff 0 30%,#ff4d6d 31% 60%,#4d9dff 61% 100%)}
 .ico.bolt{clip-path:polygon(45% 0,65% 0,52% 35%,75% 35%,35% 100%,46% 58%,24% 58%);background:#ffd166;border-radius:0;width:12px;height:14px}
 .ico.rocket{background:linear-gradient(180deg,#b8d8ff,#5f8fd9);border-radius:6px 6px 10px 10px;transform:rotate(-25deg)}
-.ico.worm{width:14px;height:10px;border-radius:10px;background:linear-gradient(90deg,#7dffbd,#2fd38d);box-shadow:6px 0 0 #20b977}}}
+.ico.worm{width:14px;height:10px;border-radius:10px;background:linear-gradient(90deg,#7dffbd,#2fd38d);box-shadow:6px 0 0 #20b977}}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
 @keyframes slotPulse{0%,100%{box-shadow:inset 0 2px 4px rgba(0,0,0,.6),0 0 8px rgba(48,178,132,.2)}50%{box-shadow:inset 0 2px 4px rgba(0,0,0,.6),0 0 16px rgba(48,178,132,.45)}}
 .crt-on{position:relative}
