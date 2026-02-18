@@ -24,7 +24,7 @@ header h1{margin:0 0 6px}.ver{font-size:.65rem;padding:2px 6px;border:1px solid 
 @media (prefers-reduced-motion: reduce){.ico{animation:none}}
 @media (max-height: 820px){.wrap{padding:12px}}
 .hud{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0}.hud div{background:#11162b;border:1px solid #29335f;padding:6px;border-radius:10px;font-size:.82rem}.hud strong{display:block;font-size:1rem}
-.arena{position:relative;flex:1;min-height:300px;height:auto;background:#0f1430;border-radius:14px;border:1px solid #2a3568;overflow:hidden}
+.arena{position:relative;width:100%;aspect-ratio:1/1;max-width:100%;margin:0 auto;background:#0f1430;border-radius:14px;border:1px solid #2a3568;overflow:hidden}
 .arena.game-over{animation:arenaFlash .35s ease-in-out 2}
 .core{position:absolute;left:50%;top:50%;width:34px;height:34px;transform:translate(-50%,-50%);background:#7e93ff;border-radius:50%;box-shadow:0 0 18px rgba(126,147,255,.8)}
 .ring{position:absolute;left:50%;top:50%;width:140px;height:140px;transform:translate(-50%,-50%);border:2px dashed #4b5cb2;border-radius:50%}
@@ -36,7 +36,7 @@ header h1{margin:0 0 6px}.ver{font-size:.65rem;padding:2px 6px;border:1px solid 
 .enemy{position:absolute;width:20px;height:20px;border-radius:50%;background:#ff7b87;box-shadow:0 0 12px rgba(255,123,135,.7)}
 .judge{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);font-weight:700}
 .judge.ok{color:var(--ok)}.judge.warn{color:var(--warn)}.judge.bad{color:var(--bad)}
-.controls{margin-top:8px;display:grid;gap:8px;position:sticky;bottom:8px}
+.controls{margin-top:10px;display:grid;gap:8px;position:relative}
 .controls button{border-radius:14px;border:1px solid #3b4b90;background:#243065;color:#fff;font-weight:800;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 #start{padding:12px 14px;font-size:1rem}
 .help{margin:0 0 4px;color:var(--muted);font-size:.9rem;text-align:center}
@@ -51,7 +51,7 @@ button,.dir,#start{min-width:48px;min-height:48px}
 button:focus-visible{outline:3px solid #9cb0ff;outline-offset:2px}
 @media (max-width:560px){
   .wrap{padding:12px}
-  .arena{min-height:240px}
+  .arena{width:100%;aspect-ratio:1/1;min-height:0}
   .dpad{grid-template-columns:repeat(3,minmax(84px,1fr));grid-template-rows:repeat(2,84px);gap:12px}
   .dir{font-size:1.7rem}
   .hud{grid-template-columns:repeat(2,1fr)}
