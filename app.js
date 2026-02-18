@@ -76,6 +76,13 @@ el.tapBtn.addEventListener('click', () => {
   state.energy -= 1;
   state.coins += state.tapPower;
   flash(`+${state.tapPower} 코인 획득!`, 'ok');
+
+  const pop = document.createElement('span');
+  pop.className = 'coin-pop';
+  pop.textContent = `+${state.tapPower}`;
+  el.tapBtn.appendChild(pop);
+  setTimeout(() => pop.remove(), 820);
+
   track('tap', { gain: state.tapPower, coins: state.coins });
   render();
 });
