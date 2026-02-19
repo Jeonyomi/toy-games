@@ -5,7 +5,8 @@
     { href: '/reaction-dash/index.html', name: 'Reaction Dash', meta: 'Easy · 1 min · 1P' },
     { href: '/astro-dodge/index.html', name: 'Astro Dodge', meta: 'Medium · 2 min · 1P' },
     { href: '/worm-tail/index.html', name: 'Worm Tail', meta: 'Medium · 4 min · 1P' },
-    { href: '/perfect-stack/index.html', name: 'Perfect Stack', meta: 'Easy · 2 min · 1P' }
+    { href: '/perfect-stack/index.html', name: 'Perfect Stack', meta: 'Easy · 2 min · 1P' },
+    { href: '/orbit-defender/index.html', name: 'Orbit Defender', meta: 'Medium · 3 min · 1P' }
   ];
 
   const root = document.querySelector('.app, .wrap');
