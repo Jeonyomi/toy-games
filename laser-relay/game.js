@@ -1,7 +1,7 @@
 const SAVE_KEY = 'bb_laser_relay_save_v1';
 
 const LEVELS = [
-  { emitter:{r:3,c:0,dir:'R'}, target:{r:0,c:6}, obstacles:[[1,3],[4,5]], slots:[{r:3,c:2,initial:0},{r:1,c:5,initial:0}] },
+  { emitter:{r:3,c:0,dir:'R'}, target:{r:0,c:6}, obstacles:[[1,3],[4,5]], slots:[{r:3,c:2,initial:0},{r:0,c:2,initial:0}] },
   { emitter:{r:6,c:1,dir:'U'}, target:{r:0,c:5}, obstacles:[[2,2],[3,4],[5,3]], slots:[{r:4,c:1,initial:0},{r:2,c:4,initial:0},{r:1,c:5,initial:0}] },
   { emitter:{r:0,c:0,dir:'R'}, target:{r:6,c:6}, obstacles:[[1,1],[2,3],[3,3],[5,2]], slots:[{r:0,c:4,initial:0},{r:3,c:5,initial:0},{r:5,c:6,initial:0}] },
   { emitter:{r:6,c:0,dir:'R'}, target:{r:1,c:6}, obstacles:[[5,2],[4,3],[3,1],[2,4]], slots:[{r:6,c:3,initial:0},{r:4,c:5,initial:0},{r:2,c:6,initial:0}] },
