@@ -124,15 +124,17 @@ function addBurst(x, y, n = 12){
 
 function update(dt){
   level = levelForScore(score);
-  spawnTimer += dt;
+  // spawnTimer is tracked in milliseconds
+  spawnTimer += dt * 1000;
   fireCd -= dt;
   if (comboTimeout > 0) {
     comboTimeout -= dt;
     if (comboTimeout <= 0) combo = 1;
   }
 
-  while (spawnTimer >= spawnInterval()) {
-    spawnTimer -= spawnInterval();
+  const interval = spawnInterval();
+  while (spawnTimer >= interval) {
+    spawnTimer -= interval;
     spawnAsteroid();
   }
 
