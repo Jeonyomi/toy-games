@@ -210,10 +210,25 @@ function onWin(){
   const prevBest = save.best[idx];
   if (!Number.isFinite(prevBest) || state.moves < prevBest) save.best[idx] = state.moves;
   save.cleared[idx] = true;
-  if (save.unlocked < LEVELS.length) save.unlocked = Math.max(save.unlocked, idx + 2);
+
+  const isLast = idx === LEVELS.length - 1;
+  if (!isLast) {
+    if (save.unlocked < LEVELS.length) save.unlocked = Math.max(save.unlocked, idx + 2);
+    persist();
+    setStageButtons();
+    statusEl.textContent = `Stage clear in ${state.moves} moves!`;
+    return;
+  }
+
+  // Final clear: show message then restart game loop (keep best records).
+  save.unlocked = LEVELS.length;
   persist();
   setStageButtons();
-  statusEl.textContent = `Stage clear in ${state.moves} moves!`;
+  statusEl.textContent = `All stages cleared! Restarting…`;
+  setTimeout(() => {
+    loadStage(0);
+    statusEl.textContent = 'New run started. Try to beat your best moves!';
+  }, 900);
 }
 
 function cycleSlot(r,c){
