@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#181226" />
+  <title>Laser Relay</title>
+  <link rel="stylesheet" href="../ui-common.css" />
+  <link rel="stylesheet" href="../shared-nav.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="wrap">
+    <div class="marquee">🔴 BB ARCADE :: LASER RELAY MODE</div>
+    <div class="cabinet-deco" aria-hidden="true"><span class="coin-slot"></span></div>
+
+    <h1>🔺 Laser Relay <span class="ver">v1</span></h1>
+    <p class="sub">Place and rotate mirrors to guide the beam from emitter to target.</p>
+
+    <nav class="universal-actions" aria-label="Universal game actions">
+      <a class="ua-btn" href="../index.html">Home</a>
+      <button class="ua-btn" type="button" data-action="change-game">Change Game</button>
+      <button id="restartPage" class="ua-btn" type="button">Restart</button>
+    </nav>
+
+    <section class="hud" aria-label="game stats">
+      <div>Level <strong id="playerLevel">1</strong></div>
+      <div>Stage <strong id="stageLabel">1/10</strong></div>
+      <div>Moves <strong id="moves">0</strong></div>
+      <div>Best <strong id="best">-</strong></div>
+    </section>
+
+    <div id="grid" class="grid" role="grid" aria-label="Laser Relay board"></div>
+
+    <p id="status" class="status" role="status" aria-live="polite">Tap a mirror slot to cycle mirror rotation. Route laser to target.</p>
+
+    <section class="controls" aria-label="level controls">
+      <button id="prevLevel" type="button">◀ Prev</button>
+      <button id="resetLevel" type="button">Reset Level</button>
+      <button id="nextLevel" type="button">Next ▶</button>
+    </section>
+
+    <div id="stageButtons" class="stage-buttons" aria-label="stage selection"></div>
+
+    <label class="crt-toggle"><input id="crtToggle" type="checkbox" /> CRT Effect (Visual Only)</label>
+  </main>
+
+  <aside id="howtoOverlay" class="howto-overlay" role="dialog" aria-modal="true" aria-labelledby="howtoTitle">
+    <div class="howto-card">
+      <h2 id="howtoTitle">How to play Laser Relay</h2>
+      <p>Your goal is to bounce the laser from emitter ▶ to target ◎.</p>
+      <p>Tap mirror slots to cycle: empty → / → \.</p>
+      <p>Obstacles block the beam. Finish stages in fewer moves for better records.</p>
+      <div class="howto-actions">
+        <button id="dismissHowto" type="button">Got it</button>
+        <button id="dontShowHowto" type="button" class="ghost-btn">Don't show again</button>
+      </div>
+    </div>
+  </aside>
+
+  <script>
+    (function(){
+      const key='bb_arcade_crt';
+      const wrap=document.querySelector('.wrap');
+      const t=document.getElementById('crtToggle');
+      const saved=localStorage.getItem(key);
+      const on=saved==='1';
+      if(on){wrap.classList.add('crt-on'); t.checked=true;}
+      t.addEventListener('change',()=>{wrap.classList.toggle('crt-on',t.checked); localStorage.setItem(key,t.checked?'1':'0');});
+
+      document.getElementById('restartPage').addEventListener('click',()=>location.reload());
+
+      const helpKey='bb_howto_seen_laser_relay';
+      const overlay=document.getElementById('howtoOverlay');
+      const hide=()=>overlay.classList.add('hidden');
+      if(localStorage.getItem(helpKey)==='1') hide();
+      document.getElementById('dismissHowto').addEventListener('click',hide);
+      document.getElementById('dontShowHowto').addEventListener('click',()=>{localStorage.setItem(helpKey,'1');hide();});
+    })();
+  </script>
+  <script src="../shared-nav.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
