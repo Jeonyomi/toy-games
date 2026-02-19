@@ -1,16 +1,37 @@
 const SAVE_KEY = 'bb_laser_relay_save_v1';
 
+// Levels are designed to be solvable by cycling mirror slots: empty → / → \
+// Keep each stage simple and reliably solvable (mobile-first).
 const LEVELS = [
+  // 1) two-mirror intro (solvable in 2 moves)
   { emitter:{r:3,c:0,dir:'R'}, target:{r:0,c:6}, obstacles:[[1,3],[4,5]], slots:[{r:3,c:2,initial:0},{r:0,c:2,initial:0}] },
-  { emitter:{r:6,c:1,dir:'U'}, target:{r:0,c:5}, obstacles:[[2,2],[3,4],[5,3]], slots:[{r:4,c:1,initial:0},{r:2,c:4,initial:0},{r:1,c:5,initial:0}] },
-  { emitter:{r:0,c:0,dir:'R'}, target:{r:6,c:6}, obstacles:[[1,1],[2,3],[3,3],[5,2]], slots:[{r:0,c:4,initial:0},{r:3,c:5,initial:0},{r:5,c:6,initial:0}] },
-  { emitter:{r:6,c:0,dir:'R'}, target:{r:1,c:6}, obstacles:[[5,2],[4,3],[3,1],[2,4]], slots:[{r:6,c:3,initial:0},{r:4,c:5,initial:0},{r:2,c:6,initial:0}] },
-  { emitter:{r:3,c:6,dir:'L'}, target:{r:0,c:0}, obstacles:[[3,4],[2,2],[1,4],[5,1]], slots:[{r:3,c:5,initial:0},{r:1,c:1,initial:0},{r:0,c:2,initial:0}] },
-  { emitter:{r:0,c:2,dir:'D'}, target:{r:6,c:4}, obstacles:[[1,2],[3,2],[4,5],[5,3]], slots:[{r:2,c:1,initial:0},{r:2,c:4,initial:0},{r:5,c:4,initial:0}] },
-  { emitter:{r:2,c:0,dir:'R'}, target:{r:6,c:5}, obstacles:[[2,3],[3,3],[4,3],[5,3]], slots:[{r:1,c:2,initial:0},{r:3,c:5,initial:0},{r:6,c:4,initial:0}] },
-  { emitter:{r:6,c:6,dir:'U'}, target:{r:0,c:1}, obstacles:[[1,5],[2,4],[3,2],[5,1]], slots:[{r:4,c:6,initial:0},{r:2,c:6,initial:0},{r:0,c:4,initial:0}] },
-  { emitter:{r:0,c:5,dir:'D'}, target:{r:6,c:0}, obstacles:[[1,4],[2,2],[4,1],[5,4]], slots:[{r:3,c:5,initial:0},{r:5,c:2,initial:0},{r:6,c:1,initial:0}] },
-  { emitter:{r:3,c:0,dir:'R'}, target:{r:3,c:6}, obstacles:[[3,2],[3,4],[1,3],[5,3]], slots:[{r:2,c:1,initial:0},{r:4,c:1,initial:0},{r:1,c:5,initial:0},{r:5,c:5,initial:0}] }
+
+  // 2) corner route: bottom-left → top-right (2 mirrors)
+  { emitter:{r:6,c:0,dir:'R'}, target:{r:0,c:6}, obstacles:[], slots:[{r:6,c:4,initial:0},{r:0,c:4,initial:0}] },
+
+  // 3) top-left → bottom-right (2 mirrors)
+  { emitter:{r:0,c:0,dir:'D'}, target:{r:6,c:6}, obstacles:[[3,3]], slots:[{r:2,c:0,initial:0},{r:2,c:6,initial:0}] },
+
+  // 4) reverse corner: right-middle → top-left (2 mirrors)
+  { emitter:{r:3,c:6,dir:'L'}, target:{r:0,c:0}, obstacles:[], slots:[{r:3,c:2,initial:0},{r:0,c:2,initial:0}] },
+
+  // 5) vertical to horizontal (2 mirrors)
+  { emitter:{r:6,c:3,dir:'U'}, target:{r:0,c:0}, obstacles:[[2,3]], slots:[{r:4,c:3,initial:0},{r:4,c:0,initial:0}] },
+
+  // 6) zigzag (3 mirrors)
+  { emitter:{r:0,c:6,dir:'D'}, target:{r:6,c:0}, obstacles:[[3,6],[3,0]], slots:[{r:2,c:6,initial:0},{r:2,c:2,initial:0},{r:6,c:2,initial:0}] },
+
+  // 7) mid entry (2 mirrors)
+  { emitter:{r:3,c:0,dir:'R'}, target:{r:6,c:3}, obstacles:[[3,4]], slots:[{r:3,c:2,initial:0},{r:6,c:2,initial:0}] },
+
+  // 8) double bend around blockers (3 mirrors)
+  { emitter:{r:6,c:6,dir:'U'}, target:{r:0,c:3}, obstacles:[[4,6],[2,6]], slots:[{r:5,c:6,initial:0},{r:5,c:3,initial:0},{r:0,c:3,initial:0}] },
+
+  // 9) short puzzle (2 mirrors)
+  { emitter:{r:1,c:0,dir:'R'}, target:{r:5,c:6}, obstacles:[[1,4],[5,2]], slots:[{r:1,c:3,initial:0},{r:5,c:3,initial:0}] },
+
+  // 10) final: three bends to top-right (3+ mirrors)
+  { emitter:{r:6,c:1,dir:'U'}, target:{r:0,c:6}, obstacles:[], slots:[{r:2,c:1,initial:0},{r:2,c:5,initial:0},{r:0,c:5,initial:0},{r:4,c:3,initial:0}] }
 ];
 
 const DIR = { U:[-1,0], R:[0,1], D:[1,0], L:[0,-1] };
