@@ -105,6 +105,14 @@
         </div>
         <p>Move, jump, shoot. Charge ultimate.</p>
       </a>
+
+      <a class="game-card theme-neon" data-tags="neon arcade" href="./neon-survivor/index.html">
+        <div class="game-card-top">
+          <div class="game-title"><span class="game-badge" aria-hidden="true">🧬</span><strong>Neon Survivor 3D</strong></div>
+          <span class="pill">Neon</span>
+        </div>
+        <p>Auto-attack. Level up and pick skills.</p>
+      </a>
     </section>
 
     <footer class="home-foot">
@@ -124,7 +132,7 @@
 
       document.getElementById('browseGames').addEventListener('click',()=>window.arcadeMenu?.open());
 
-      const links=['./tap2earn/index.html','./beat-shield/index.html','./reaction-dash/index.html','./astro-dodge/index.html','./worm-tail/index.html','./perfect-stack/index.html','./orbit-defender/index.html','./laser-relay/index.html','./neon-tank/index.html'];
+      const links=['./tap2earn/index.html','./beat-shield/index.html','./reaction-dash/index.html','./astro-dodge/index.html','./worm-tail/index.html','./perfect-stack/index.html','./orbit-defender/index.html','./laser-relay/index.html','./neon-tank/index.html','./neon-survivor/index.html'];
       document.getElementById('playRandom').addEventListener('click',()=>{
         const pick=links[Math.floor(Math.random()*links.length)];
         location.href=pick;

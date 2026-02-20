@@ -1,0 +1,730 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#050510" />
+  <title>Neon Survivor 3D</title>
+  <link rel="stylesheet" href="../ui-common.css" />
+  <link rel="stylesheet" href="../shared-nav.css" />
+  <link rel="stylesheet" href="style.css" />
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <main class="wrap">
+    <div class="marquee">🎮 BB ARCADE :: NEON SURVIVOR MODE</div>
+    <div class="cabinet-deco" aria-hidden="true"><span class="coin-slot"></span></div>
+
+    <h1 style="margin:0">🧬 Neon Survivor 3D <span class="ver">v1</span></h1>
+    <p class="sub">Auto-attack survivor. Level up and pick skills.</p>
+
+    <nav class="universal-actions" aria-label="Universal game actions">
+      <a class="ua-btn" href="../index.html">Home</a>
+      <button class="ua-btn" type="button" data-action="change-game">Change Game</button>
+      <button id="restartPage" class="ua-btn" type="button">Restart</button>
+    </nav>
+
+    <section class="stage" aria-label="game stage">
+      <div id="stageMount" style="position:absolute;inset:0"></div>
+
+      <div id="uiLayer">
+        <div class="top-bar">
+          <div class="stats">
+            <div>LEVEL <span id="levelText">1</span></div>
+            <div>TIME <span id="timeText">00:00</span></div>
+            <div>KILLS <span id="killText">0</span></div>
+          </div>
+          <div class="xp-container"><div class="xp-bar" id="xpBar"></div></div>
+        </div>
+        <div id="floatingEntities"></div>
+      </div>
+
+      <div id="screens">
+        <div id="startScreen" style="display:flex;">
+          <div class="screen-title title-neon">NEON SURVIVOR</div>
+          <div class="title-sub">Survive the endless geometric horde.</div>
+          <div class="title-sub" style="margin-bottom:18px">WASD / Arrow Keys to Move · Auto-attack</div>
+          <button class="btn" id="startBtn">START GAME</button>
+        </div>
+
+        <div id="levelUpScreen">
+          <div class="screen-title title-level-up">LEVEL UP!</div>
+          <div class="cards-container" id="cardsContainer"></div>
+        </div>
+
+        <div id="gameOverScreen">
+          <div class="screen-title title-game-over">SYSTEM FAILURE</div>
+          <div class="title-sub" id="gameOverStats">Survived 00:00 - 0 Kills</div>
+          <button class="btn" id="restartBtn">REBOOT</button>
+        </div>
+      </div>
+    </section>
+
+    <label class="crt-toggle"><input id="crtToggle" type="checkbox" /> CRT Effect (Visual Only)</label>
+  </main>
+
+  <script>
+    (function(){
+      const key='bb_arcade_crt';
+      const wrap=document.querySelector('.wrap');
+      const t=document.getElementById('crtToggle');
+      const saved=localStorage.getItem(key);
+      const on=saved==='1';
+      if(on){wrap.classList.add('crt-on'); t.checked=true;}
+      t.addEventListener('change',()=>{wrap.classList.toggle('crt-on',t.checked); localStorage.setItem(key,t.checked?'1':'0');});
+      document.getElementById('restartPage').addEventListener('click',()=>location.reload());
+    })();
+  </script>
+
+  <script src="../shared-nav.js"></script>
+
+  <script type="module">
+    import * as THREE from 'three';
+
+    // --- SKILL DEFINITIONS ---
+    const SKILL_DB = {
+      magic_missile: { id: 'magic_missile', name: 'Magic Missile', icon: '✨', desc: 'Fires tracking missiles at the nearest enemy.', color: 0x00ffff, maxLevel: 5 },
+      fire_aura: { id: 'fire_aura', name: 'Plasma Aura', icon: '🔥', desc: 'Damages enemies close to you continuously.', color: 0xff4400, maxLevel: 5 },
+      orbital_shield: { id: 'orbital_shield', name: 'Orbital Shield', icon: '🪐', desc: 'Spheres orbit you, damaging enemies they touch.', color: 0xaa00ff, maxLevel: 5 },
+      lightning: { id: 'lightning', name: 'Ion Strike', icon: '⚡', desc: 'Randomly strikes enemies with high damage.', color: 0xffff00, maxLevel: 5 },
+      speed_up: { id: 'speed_up', name: 'Overclock', icon: '👟', desc: 'Increases your movement speed.', color: 0x00ff00, maxLevel: 5 },
+      max_hp: { id: 'max_hp', name: 'Armor Up', icon: '💖', desc: 'Increases maximum health by 20%.', color: 0xff0055, maxLevel: 5 }
+    };
+
+    class Game {
+      constructor() {
+        this.mount = document.getElementById('stageMount');
+        this.initThree();
+        this.initControls();
+        this.initUI();
+        this.resetState();
+
+        document.getElementById('startBtn').addEventListener('click', () => this.startGame());
+        document.getElementById('restartBtn').addEventListener('click', () => this.startGame());
+
+        this.animate = this.animate.bind(this);
+        requestAnimationFrame(this.animate);
+      }
+
+      initThree() {
+        this.scene = new THREE.Scene();
+        this.scene.background = new THREE.Color(0x050510);
+        this.scene.fog = new THREE.FogExp2(0x050510, 0.02);
+
+        const w = this.mount.clientWidth;
+        const h = this.mount.clientHeight;
+
+        this.camera = new THREE.PerspectiveCamera(60, w / h, 0.1, 1000);
+        this.cameraOffset = new THREE.Vector3(0, 25, 12);
+
+        this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+        this.renderer.setSize(w, h);
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        this.mount.appendChild(this.renderer.domElement);
+
+        const ambient = new THREE.AmbientLight(0xffffff, 0.4);
+        this.scene.add(ambient);
+
+        const dirLight = new THREE.DirectionalLight(0xffaaee, 1);
+        dirLight.position.set(10, 20, 10);
+        this.scene.add(dirLight);
+
+        const grid = new THREE.GridHelper(200, 100, 0x0f0f33, 0x0f0f33);
+        grid.position.y = -0.5;
+        this.scene.add(grid);
+
+        this.geoCube = new THREE.BoxGeometry(1, 1, 1);
+        this.geoSphere = new THREE.SphereGeometry(0.3, 16, 16);
+        this.geoGem = new THREE.OctahedronGeometry(0.4);
+
+        this.matPlayer = new THREE.MeshStandardMaterial({ color: 0x00ffff, emissive: 0x004444, metalness: 0.8, roughness: 0.2 });
+        this.matEnemyBasic = new THREE.MeshStandardMaterial({ color: 0xff0055, metalness: 0.5, roughness: 0.5 });
+        this.matEnemyFast = new THREE.MeshStandardMaterial({ color: 0xffaa00, metalness: 0.5, roughness: 0.5 });
+        this.matEnemyTank = new THREE.MeshStandardMaterial({ color: 0xaa00aa, metalness: 0.5, roughness: 0.5 });
+        this.matGem = new THREE.MeshStandardMaterial({ color: 0x00ff00, emissive: 0x005500, metalness: 0.9, roughness: 0.1 });
+        this.matProjectile = new THREE.MeshBasicMaterial({ color: 0x00ffff });
+
+        window.addEventListener('resize', () => this.resize());
+      }
+
+      resize(){
+        const w = this.mount.clientWidth;
+        const h = this.mount.clientHeight;
+        this.camera.aspect = w / h;
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(w, h);
+      }
+
+      initControls() {
+        this.keys = { w: false, a: false, s: false, d: false, arrowup: false, arrowdown: false, arrowleft: false, arrowright: false };
+        window.addEventListener('keydown', (e) => {
+          const k = e.key.toLowerCase();
+          if (this.keys.hasOwnProperty(k)) this.keys[k] = true;
+        });
+        window.addEventListener('keyup', (e) => {
+          const k = e.key.toLowerCase();
+          if (this.keys.hasOwnProperty(k)) this.keys[k] = false;
+        });
+      }
+
+      initUI() {
+        this.ui = {
+          screens: document.getElementById('screens'),
+          start: document.getElementById('startScreen'),
+          levelUp: document.getElementById('levelUpScreen'),
+          gameOver: document.getElementById('gameOverScreen'),
+          levelText: document.getElementById('levelText'),
+          timeText: document.getElementById('timeText'),
+          killText: document.getElementById('killText'),
+          xpBar: document.getElementById('xpBar'),
+          cardsContainer: document.getElementById('cardsContainer'),
+          gameOverStats: document.getElementById('gameOverStats'),
+          floatingEntities: document.getElementById('floatingEntities')
+        };
+      }
+
+      resetState() {
+        this.state = 'start';
+        this.lastTime = performance.now();
+        this.gameTime = 0;
+        this.kills = 0;
+
+        this.player = {
+          mesh: null,
+          pos: new THREE.Vector3(0, 0, 0),
+          hp: 100,
+          maxHp: 100,
+          speed: 8,
+          xp: 0,
+          levelxp: 3,
+          level: 1,
+          skills: {},
+          hpBarEl: null
+        };
+
+        this.entities = { enemies: [], gems: [], projectiles: [], effects: [] };
+
+        this.skillTimers = { magic_missile: 0, fire_aura: 0, lightning: 0 };
+        this.orbitalShieldCubes = [];
+        this.auraMesh = null;
+
+        this.ui.floatingEntities.innerHTML = '';
+        this.ui.screens.style.display = 'flex';
+        this.ui.start.style.display = 'flex';
+        this.ui.levelUp.style.display = 'none';
+        this.ui.gameOver.style.display = 'none';
+      }
+
+      startGame() {
+        if (this.player.mesh) this.scene.remove(this.player.mesh);
+        this.entities.enemies.forEach(e => { this.scene.remove(e.mesh); if (e.hpBarEl) e.hpBarEl.remove(); });
+        this.entities.gems.forEach(g => this.scene.remove(g.mesh));
+        this.entities.projectiles.forEach(p => this.scene.remove(p.mesh));
+        this.entities.effects.forEach(e => this.scene.remove(e.mesh));
+        if (this.auraMesh) this.scene.remove(this.auraMesh);
+        this.orbitalShieldCubes.forEach(c => this.scene.remove(c));
+
+        this.resetState();
+
+        this.player.mesh = new THREE.Mesh(this.geoCube, this.matPlayer);
+        this.player.mesh.position.y = 0;
+        this.scene.add(this.player.mesh);
+
+        this.player.skills['magic_missile'] = 1;
+
+        this.ui.screens.style.display = 'none';
+        this.ui.start.style.display = 'none';
+        this.ui.levelUp.style.display = 'none';
+        this.ui.gameOver.style.display = 'none';
+        this.updateUI();
+
+        this.state = 'playing';
+        this.lastTime = performance.now();
+
+        this.player.hpBarEl = this.createFloatingHpBar();
+        this.player.hpBarEl.children[0].classList.add('player-hp-bar');
+      }
+
+      createFloatingHpBar() {
+        const el = document.createElement('div');
+        el.className = 'floating-hp';
+        const bar = document.createElement('div');
+        bar.className = 'floating-hp-bar';
+        el.appendChild(bar);
+        this.ui.floatingEntities.appendChild(el);
+        return el;
+      }
+
+      showDamageText(pos, damage, color = '#fff') {
+        const el = document.createElement('div');
+        el.className = 'damage-text';
+        el.innerText = Math.floor(damage);
+        el.style.color = color;
+        this.ui.floatingEntities.appendChild(el);
+
+        const screenPos = pos.clone().project(this.camera);
+        const x = (screenPos.x * .5 + .5) * this.mount.clientWidth;
+        const y = (screenPos.y * -.5 + .5) * this.mount.clientHeight;
+        el.style.left = `${x}px`;
+        el.style.top = `${y}px`;
+
+        setTimeout(() => el.remove(), 800);
+      }
+
+      updateFloatingBar(el, pos, current, max) {
+        if (!el) return;
+        const screenPos = pos.clone().project(this.camera);
+        if (screenPos.z > 1) { el.style.display = 'none'; return; }
+        el.style.display = 'block';
+        const x = (screenPos.x * .5 + .5) * this.mount.clientWidth;
+        const y = (screenPos.y * -.5 + .5) * this.mount.clientHeight - 30;
+        el.style.left = `${x}px`;
+        el.style.top = `${y}px`;
+        el.children[0].style.width = `${Math.max(0, (current / max) * 100)}%`;
+      }
+
+      triggerLevelUp() {
+        this.state = 'levelup';
+        this.ui.screens.style.display = 'flex';
+        this.ui.levelUp.style.display = 'flex';
+        this.ui.start.style.display = 'none';
+        this.ui.gameOver.style.display = 'none';
+
+        this.ui.cardsContainer.innerHTML = '';
+        const available = Object.keys(SKILL_DB).filter(k => (this.player.skills[k] || 0) < SKILL_DB[k].maxLevel);
+        available.sort(() => 0.5 - Math.random());
+        const choices = available.slice(0, 3);
+
+        if (choices.length === 0) {
+          this.healPlayer(50);
+          this.resumeGame();
+          return;
+        }
+
+        choices.forEach(key => {
+          const skill = SKILL_DB[key];
+          const curLevel = this.player.skills[key] || 0;
+
+          const el = document.createElement('div');
+          el.className = 'skill-card';
+          el.innerHTML = `
+            <div class="skill-icon">${skill.icon}</div>
+            <div class="skill-name">${skill.name}</div>
+            <div class="skill-desc">${skill.desc}</div>
+            <div class="skill-level">${curLevel > 0 ? 'LEVEL ' + (curLevel + 1) : 'NEW'}</div>
+          `;
+          el.onclick = () => {
+            this.player.skills[key] = curLevel + 1;
+            this.applyPassiveSkills();
+            this.resumeGame();
+          };
+          this.ui.cardsContainer.appendChild(el);
+        });
+      }
+
+      applyPassiveSkills() {
+        if (this.player.skills['speed_up']) {
+          this.player.speed = 8 + this.player.skills['speed_up'] * 1.5;
+        }
+        if (this.player.skills['max_hp']) {
+          const extraHp = this.player.skills['max_hp'] * 20;
+          this.player.maxHp = 100 + extraHp;
+          this.player.hp = Math.min(this.player.hp + 20, this.player.maxHp);
+        }
+      }
+
+      resumeGame() {
+        this.ui.screens.style.display = 'none';
+        this.ui.levelUp.style.display = 'none';
+        this.state = 'playing';
+        this.lastTime = performance.now();
+        this.updateUI();
+      }
+
+      die() {
+        this.state = 'gameover';
+        this.ui.screens.style.display = 'flex';
+        this.ui.gameOver.style.display = 'flex';
+
+        const min = Math.floor(this.gameTime / 60);
+        const sec = Math.floor(this.gameTime % 60);
+        const timeStr = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+        this.ui.gameOverStats.innerText = `Survived ${timeStr} - ${this.kills} Kills - Level ${this.player.level}`;
+      }
+
+      healPlayer(amt) { this.player.hp = Math.min(this.player.hp + amt, this.player.maxHp); }
+
+      takeDamage(amt) {
+        this.player.hp -= amt;
+        if (this.player.hp <= 0) { this.player.hp = 0; this.die(); }
+      }
+
+      gainXP(amt) {
+        this.player.xp += amt;
+        if (this.player.xp >= this.player.levelxp) {
+          this.player.xp -= this.player.levelxp;
+          this.player.level++;
+          this.player.levelxp = Math.floor(this.player.levelxp * 1.3 + 2);
+          this.player.hp = Math.min(this.player.hp + 10, this.player.maxHp);
+          this.triggerLevelUp();
+        } else {
+          this.updateUI();
+        }
+      }
+
+      updateUI() {
+        this.ui.levelText.innerText = this.player.level;
+        this.ui.killText.innerText = this.kills;
+        this.ui.xpBar.style.width = `${(this.player.xp / this.player.levelxp) * 100}%`;
+      }
+
+      spawnEnemy() {
+        const intensity = 1 + (this.gameTime / 30);
+        const maxEnemies = Math.min(200, 30 + this.gameTime * 0.5);
+        if (this.entities.enemies.length >= maxEnemies) return;
+
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 25 + Math.random() * 10;
+        const pos = new THREE.Vector3(
+          this.player.pos.x + Math.cos(angle) * dist,
+          0,
+          this.player.pos.z + Math.sin(angle) * dist
+        );
+
+        const r = Math.random();
+        let type, hp, speed, mat;
+        if (r < 0.1 && this.gameTime > 60) {
+          type = 'tank'; hp = 30 * intensity; speed = 2; mat = this.matEnemyTank;
+        } else if (r < 0.3 && this.gameTime > 30) {
+          type = 'fast'; hp = 5 * intensity; speed = 7; mat = this.matEnemyFast;
+        } else {
+          type = 'basic'; hp = 10 * intensity; speed = 4; mat = this.matEnemyBasic;
+        }
+
+        const mesh = new THREE.Mesh(this.geoCube, mat);
+        if (type === 'tank') mesh.scale.set(1.5, 1.5, 1.5);
+        if (type === 'fast') mesh.scale.set(0.6, 0.6, 0.6);
+        mesh.position.copy(pos);
+        this.scene.add(mesh);
+
+        this.entities.enemies.push({
+          mesh, hp, maxHp: hp, speed, type,
+          damage: (type === 'tank' ? 15 : type === 'fast' ? 5 : 10),
+          pos, hpBarEl: null
+        });
+      }
+
+      spawnGem(pos, val = 1) {
+        const mesh = new THREE.Mesh(this.geoGem, this.matGem);
+        mesh.position.copy(pos);
+        mesh.position.y = 1;
+        this.scene.add(mesh);
+        this.entities.gems.push({ mesh, pos: mesh.position, val, flyTarget: false });
+      }
+
+      executeSkills(dt) {
+        const pSkills = this.player.skills;
+
+        if (pSkills['magic_missile']) {
+          this.skillTimers.magic_missile -= dt;
+          if (this.skillTimers.magic_missile <= 0) {
+            const lvl = pSkills['magic_missile'];
+            const cooldown = Math.max(0.2, 1.0 - lvl * 0.15);
+            this.skillTimers.magic_missile = cooldown;
+
+            const count = 1 + Math.floor(lvl / 2);
+            const targets = [...this.entities.enemies]
+              .sort((a, b) => a.pos.distanceToSquared(this.player.pos) - b.pos.distanceToSquared(this.player.pos))
+              .slice(0, count);
+
+            targets.forEach((target, i) => {
+              setTimeout(() => {
+                if (this.state !== 'playing') return;
+                const mesh = new THREE.Mesh(this.geoSphere, this.matProjectile);
+                mesh.position.copy(this.player.pos);
+                mesh.position.y = 0.5;
+                this.scene.add(mesh);
+                this.entities.projectiles.push({ mesh, type: 'magic_missile', target, speed: 15, damage: 8 + lvl * 4, pos: mesh.position });
+              }, i * 100);
+            });
+          }
+        }
+
+        if (pSkills['fire_aura']) {
+          const lvl = pSkills['fire_aura'];
+          const radius = 3 + lvl * 0.5;
+          const damage = 5 + lvl * 3;
+
+          if (!this.auraMesh) {
+            const geo = new THREE.RingGeometry(0, radius, 32);
+            const mat = new THREE.MeshBasicMaterial({ color: 0xff4400, side: THREE.DoubleSide, transparent: true, opacity: 0.3, blending: THREE.AdditiveBlending });
+            this.auraMesh = new THREE.Mesh(geo, mat);
+            this.auraMesh.rotation.x = -Math.PI / 2;
+            this.auraMesh.position.y = 0.1;
+            this.scene.add(this.auraMesh);
+          } else {
+            this.auraMesh.scale.setScalar(radius / 3.5);
+          }
+          this.auraMesh.position.x = this.player.pos.x;
+          this.auraMesh.position.z = this.player.pos.z;
+          this.auraMesh.rotation.z += dt * 2;
+
+          this.skillTimers.fire_aura -= dt;
+          if (this.skillTimers.fire_aura <= 0) {
+            this.skillTimers.fire_aura = 0.5;
+            this.entities.enemies.forEach(e => {
+              if (e.pos.distanceTo(this.player.pos) <= radius) this.damageEnemy(e, damage);
+            });
+          }
+        }
+
+        if (pSkills['orbital_shield']) {
+          const lvl = pSkills['orbital_shield'];
+          const count = 1 + lvl;
+          const radius = 2.5;
+          const sp = 2 + lvl * 0.5;
+          const damage = 10 + lvl * 5;
+
+          while (this.orbitalShieldCubes.length < count) {
+            const m = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.6, 0.6), new THREE.MeshBasicMaterial({ color: 0xaa00ff, blending: THREE.AdditiveBlending }));
+            this.scene.add(m);
+            this.orbitalShieldCubes.push(m);
+          }
+
+          const time = performance.now() * 0.001 * sp;
+          this.orbitalShieldCubes.forEach((m, i) => {
+            const angle = time + (i / count) * Math.PI * 2;
+            m.position.set(this.player.pos.x + Math.cos(angle) * radius, 0.5, this.player.pos.z + Math.sin(angle) * radius);
+            m.rotation.x += dt; m.rotation.y += dt;
+
+            this.entities.enemies.forEach(e => {
+              if (e.pos.distanceTo(m.position) < 1.0) {
+                if (!e.lastOrbHit || performance.now() - e.lastOrbHit > 500) {
+                  this.damageEnemy(e, damage);
+                  e.lastOrbHit = performance.now();
+                  const m2 = m.material.clone();
+                  m2.color.setHex(0xffffff);
+                  m.material = m2;
+                  setTimeout(() => m.material.color.setHex(0xaa00ff), 100);
+                }
+              }
+            });
+          });
+        }
+
+        if (pSkills['lightning']) {
+          this.skillTimers.lightning -= dt;
+          if (this.skillTimers.lightning <= 0) {
+            const lvl = pSkills['lightning'];
+            this.skillTimers.lightning = Math.max(1.0, 3.0 - lvl * 0.4);
+            const count = 1 + Math.floor(lvl / 2);
+            const damage = 30 + lvl * 15;
+
+            const candidates = [...this.entities.enemies];
+            candidates.sort(() => 0.5 - Math.random());
+            candidates.slice(0, count).forEach(e => {
+              this.damageEnemy(e, damage);
+              this.createLightningEffect(e.pos);
+            });
+          }
+        }
+      }
+
+      createLightningEffect(pos) {
+        const geo = new THREE.CylinderGeometry(0.2, 0.2, 20, 8);
+        const mat = new THREE.MeshBasicMaterial({ color: 0xffff00, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending });
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.position.copy(pos);
+        mesh.position.y = 10;
+        this.scene.add(mesh);
+        this.entities.effects.push({ mesh, duration: 0.2, time: 0 });
+      }
+
+      damageEnemy(e, amt) {
+        e.hp -= amt;
+        this.showDamageText(e.pos, amt);
+
+        if (e.mesh.material.emissive) {
+          e.mesh.material.emissive.setHex(0xffffff);
+          setTimeout(() => { if (e.mesh && e.mesh.material.emissive) e.mesh.material.emissive.setHex(0x000000); }, 50);
+        }
+
+        if (!e.hpBarEl && e.hp > 0) {
+          const el = document.createElement('div');
+          el.className = 'floating-hp';
+          const bar = document.createElement('div');
+          bar.className = 'floating-hp-bar';
+          bar.style.backgroundColor = '#f00';
+          el.appendChild(bar);
+          this.ui.floatingEntities.appendChild(el);
+          e.hpBarEl = el;
+        }
+      }
+
+      update(dt) {
+        this.gameTime += dt;
+
+        let dx = 0, dz = 0;
+        if (this.keys.w || this.keys.arrowup) dz -= 1;
+        if (this.keys.s || this.keys.arrowdown) dz += 1;
+        if (this.keys.a || this.keys.arrowleft) dx -= 1;
+        if (this.keys.d || this.keys.arrowright) dx += 1;
+
+        if (dx !== 0 || dz !== 0) {
+          const len = Math.sqrt(dx * dx + dz * dz);
+          dx /= len; dz /= len;
+          this.player.pos.x += dx * this.player.speed * dt;
+          this.player.pos.z += dz * this.player.speed * dt;
+
+          const targetAngle = Math.atan2(dx, dz);
+          let currentAngle = this.player.mesh.rotation.y;
+          let diff = targetAngle - currentAngle;
+          while (diff < -Math.PI) diff += Math.PI * 2;
+          while (diff > Math.PI) diff -= Math.PI * 2;
+          this.player.mesh.rotation.y += diff * 10 * dt;
+        }
+
+        this.player.mesh.position.copy(this.player.pos);
+        this.updateFloatingBar(this.player.hpBarEl, this.player.pos, this.player.hp, this.player.maxHp);
+
+        this.camera.position.lerp(this.player.pos.clone().add(this.cameraOffset), 0.1);
+        this.camera.lookAt(this.player.pos);
+
+        const min = Math.floor(this.gameTime / 60);
+        const sec = Math.floor(this.gameTime % 60);
+        this.ui.timeText.innerText = `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+
+        if (Math.random() < dt * 2) this.spawnEnemy();
+
+        this.executeSkills(dt);
+
+        for (let i = this.entities.projectiles.length - 1; i >= 0; i--) {
+          const p = this.entities.projectiles[i];
+          if (!p.target || p.target.hp <= 0) {
+            const t = this.entities.enemies[0];
+            if (t) p.target = t;
+            else { this.scene.remove(p.mesh); this.entities.projectiles.splice(i, 1); continue; }
+          }
+
+          const dir = p.target.pos.clone().sub(p.pos).normalize();
+          p.pos.add(dir.multiplyScalar(p.speed * dt));
+          p.mesh.position.copy(p.pos);
+
+          if (p.pos.distanceTo(p.target.pos) < 1) {
+            this.damageEnemy(p.target, p.damage);
+            this.scene.remove(p.mesh);
+            this.entities.projectiles.splice(i, 1);
+          }
+        }
+
+        for (let i = this.entities.enemies.length - 1; i >= 0; i--) {
+          const e = this.entities.enemies[i];
+
+          if (e.hp <= 0) {
+            this.scene.remove(e.mesh);
+            if (e.hpBarEl) e.hpBarEl.remove();
+            this.kills++;
+            this.updateUI();
+            if (Math.random() < 0.7 || e.type === 'tank') this.spawnGem(e.pos, e.type === 'tank' ? 5 : 1);
+            this.entities.enemies.splice(i, 1);
+            continue;
+          }
+
+          const sep = new THREE.Vector3();
+          let sepCount = 0;
+          for (const other of this.entities.enemies) {
+            if (other === e) continue;
+            const dist = e.pos.distanceToSquared(other.pos);
+            if (dist < 2.0) {
+              const diff = e.pos.clone().sub(other.pos).normalize().divideScalar(Math.sqrt(dist));
+              sep.add(diff);
+              sepCount++;
+            }
+          }
+
+          const dir = this.player.pos.clone().sub(e.pos).normalize();
+          if (sepCount > 0) {
+            sep.normalize().multiplyScalar(1.5);
+            dir.add(sep).normalize();
+          }
+
+          e.pos.add(dir.multiplyScalar(e.speed * dt));
+          e.mesh.position.copy(e.pos);
+          e.mesh.rotation.y = Math.atan2(dir.x, dir.z);
+
+          if (e.hpBarEl) this.updateFloatingBar(e.hpBarEl, e.pos, e.hp, e.maxHp);
+
+          if (e.pos.distanceToSquared(this.player.pos) < 1.0) {
+            if (!e.lastHitPlayer || performance.now() - e.lastHitPlayer > 1000) {
+              this.takeDamage(e.damage);
+              e.lastHitPlayer = performance.now();
+              if (this.player.mesh.material.emissive) {
+                this.player.mesh.material.emissive.setHex(0xff0000);
+                setTimeout(() => this.player.mesh.material.emissive.setHex(0x004444), 100);
+              }
+            }
+          }
+        }
+
+        const pickupRadiusSq = Math.pow(3.5, 2);
+        for (let i = this.entities.gems.length - 1; i >= 0; i--) {
+          const g = this.entities.gems[i];
+
+          if (g.pos.y > 0 && !g.flyTarget) {
+            g.pos.y -= 2 * dt;
+            if (g.pos.y < 0) g.pos.y = 0;
+          }
+          g.mesh.rotation.y += dt * 2;
+          g.mesh.rotation.x += dt;
+
+          if (!g.flyTarget && g.pos.distanceToSquared(this.player.pos) < pickupRadiusSq) g.flyTarget = true;
+
+          if (g.flyTarget) {
+            const dir = this.player.pos.clone().sub(g.pos).normalize();
+            g.pos.add(dir.multiplyScalar(15 * dt));
+            if (g.pos.distanceToSquared(this.player.pos) < 0.5) {
+              this.gainXP(g.val);
+              this.scene.remove(g.mesh);
+              this.entities.gems.splice(i, 1);
+            }
+          }
+          g.mesh.position.copy(g.pos);
+        }
+
+        for (let i = this.entities.effects.length - 1; i >= 0; i--) {
+          const eff = this.entities.effects[i];
+          eff.time += dt;
+          eff.mesh.material.opacity = 0.8 * (1 - (eff.time / eff.duration));
+          if (eff.time >= eff.duration) {
+            this.scene.remove(eff.mesh);
+            this.entities.effects.splice(i, 1);
+          }
+        }
+      }
+
+      animate() {
+        requestAnimationFrame(this.animate);
+        const now = performance.now();
+        const dt = Math.min((now - this.lastTime) / 1000, 0.1);
+        this.lastTime = now;
+
+        if (this.state === 'playing') this.update(dt);
+
+        this.renderer.render(this.scene, this.camera);
+      }
+    }
+
+    window.addEventListener('load', () => {
+      new Game();
+    });
+  </script>
+</body>
+</html>
