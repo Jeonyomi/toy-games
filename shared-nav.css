@@ -3,6 +3,12 @@
   position: relative;
 }
 
+/* Prevent top-right hamburger button from overlapping marquee text */
+.app .marquee,
+.wrap .marquee {
+  padding-right: 64px;
+}
+
 .arcade-menu-toggle {
   position: absolute;
   top: 10px;
