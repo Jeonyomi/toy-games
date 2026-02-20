@@ -30,41 +30,79 @@
       <button id="browseGames" class="cta-secondary">Open Menu</button>
     </section>
 
-    <section class="game-list" aria-label="Game list">
-      <a class="game-card" href="./tap2earn/index.html">
-        <div class="game-card-top"><strong>Tap2Earn</strong><span class="pill">Easy</span></div>
+    <section class="filters" aria-label="Filters">
+      <button class="filter-pill active" type="button" data-filter="all">All</button>
+      <button class="filter-pill" type="button" data-filter="easy">Easy</button>
+      <button class="filter-pill" type="button" data-filter="arcade">Arcade</button>
+      <button class="filter-pill" type="button" data-filter="action">Action</button>
+      <button class="filter-pill" type="button" data-filter="reflex">Reflex</button>
+      <button class="filter-pill" type="button" data-filter="shooter">Shooter</button>
+      <button class="filter-pill" type="button" data-filter="puzzle">Puzzle</button>
+      <button class="filter-pill" type="button" data-filter="neon">Neon</button>
+    </section>
+
+    <section class="game-list" aria-label="Game list" id="gameList">
+      <a class="game-card theme-tap" data-tags="easy" href="./tap2earn/index.html">
+        <div class="game-card-top">
+          <div class="game-title"><span class="game-badge" aria-hidden="true">🪙</span><strong>Tap2Earn</strong></div>
+          <span class="pill">Easy</span>
+        </div>
         <p>Tap to earn coins. Upgrade power & energy.</p>
       </a>
-      <a class="game-card" href="./beat-shield/index.html">
-        <div class="game-card-top"><strong>Beat Shield</strong><span class="pill">Action</span></div>
+      <a class="game-card theme-shield" data-tags="action" href="./beat-shield/index.html">
+        <div class="game-card-top">
+          <div class="game-title"><span class="game-badge" aria-hidden="true">🛡️</span><strong>Beat Shield</strong></div>
+          <span class="pill">Action</span>
+        </div>
         <p>Defend the core with timing & arrows.</p>
       </a>
-      <a class="game-card" href="./reaction-dash/index.html">
-        <div class="game-card-top"><strong>Reaction Dash</strong><span class="pill">Reflex</span></div>
+      <a class="game-card theme-reflex" data-tags="reflex easy" href="./reaction-dash/index.html">
+        <div class="game-card-top">
+          <div class="game-title"><span class="game-badge" aria-hidden="true">⚡</span><strong>Reaction Dash</strong></div>
+          <span class="pill">Reflex</span>
+        </div>
         <p>Wait for green. Tap instantly.</p>
       </a>
-      <a class="game-card" href="./astro-dodge/index.html">
-        <div class="game-card-top"><strong>Astro Dodge</strong><span class="pill">Arcade</span></div>
+      <a class="game-card theme-astro" data-tags="arcade" href="./astro-dodge/index.html">
+        <div class="game-card-top">
+          <div class="game-title"><span class="game-badge" aria-hidden="true">🚀</span><strong>Astro Dodge</strong></div>
+          <span class="pill">Arcade</span>
+        </div>
         <p>Dodge hazards and survive the run.</p>
       </a>
-      <a class="game-card" href="./worm-tail/index.html">
-        <div class="game-card-top"><strong>Worm Tail</strong><span class="pill">Arcade</span></div>
+      <a class="game-card theme-worm" data-tags="arcade" href="./worm-tail/index.html">
+        <div class="game-card-top">
+          <div class="game-title"><span class="game-badge" aria-hidden="true">🐛</span><strong>Worm Tail</strong></div>
+          <span class="pill">Arcade</span>
+        </div>
         <p>Grow the worm. Avoid collisions.</p>
       </a>
-      <a class="game-card" href="./perfect-stack/index.html">
-        <div class="game-card-top"><strong>Perfect Stack</strong><span class="pill">Easy</span></div>
+      <a class="game-card theme-stack" data-tags="easy" href="./perfect-stack/index.html">
+        <div class="game-card-top">
+          <div class="game-title"><span class="game-badge" aria-hidden="true">🧱</span><strong>Perfect Stack</strong></div>
+          <span class="pill">Easy</span>
+        </div>
         <p>Stack blocks. Chase a perfect combo.</p>
       </a>
-      <a class="game-card" href="./orbit-defender/index.html">
-        <div class="game-card-top"><strong>Orbit Defender</strong><span class="pill">Shooter</span></div>
+      <a class="game-card theme-orbit" data-tags="shooter arcade" href="./orbit-defender/index.html">
+        <div class="game-card-top">
+          <div class="game-title"><span class="game-badge" aria-hidden="true">🛰️</span><strong>Orbit Defender</strong></div>
+          <span class="pill">Shooter</span>
+        </div>
         <p>Defend your orbit. Keep it alive.</p>
       </a>
-      <a class="game-card" href="./laser-relay/index.html">
-        <div class="game-card-top"><strong>Laser Relay</strong><span class="pill">Puzzle</span></div>
+      <a class="game-card theme-laser" data-tags="puzzle" href="./laser-relay/index.html">
+        <div class="game-card-top">
+          <div class="game-title"><span class="game-badge" aria-hidden="true">🔺</span><strong>Laser Relay</strong></div>
+          <span class="pill">Puzzle</span>
+        </div>
         <p>Rotate mirrors. Route the beam.</p>
       </a>
-      <a class="game-card" href="./neon-tank/index.html">
-        <div class="game-card-top"><strong>Neon Tank</strong><span class="pill">Neon</span></div>
+      <a class="game-card theme-neon" data-tags="neon arcade" href="./neon-tank/index.html">
+        <div class="game-card-top">
+          <div class="game-title"><span class="game-badge" aria-hidden="true">🌀</span><strong>Neon Tank</strong></div>
+          <span class="pill">Neon</span>
+        </div>
         <p>Move, jump, shoot. Charge ultimate.</p>
       </a>
     </section>
@@ -91,6 +129,29 @@
         const pick=links[Math.floor(Math.random()*links.length)];
         location.href=pick;
       });
+
+      // Filters
+      const filterBtns = Array.from(document.querySelectorAll('.filter-pill'));
+      const cards = Array.from(document.querySelectorAll('.game-card[data-tags]'));
+      const activeKey = 'bb_arcade_filter';
+      let active = localStorage.getItem(activeKey) || 'all';
+
+      function applyFilter(value){
+        active = value;
+        localStorage.setItem(activeKey, value);
+        filterBtns.forEach(b=>b.classList.toggle('active', b.dataset.filter===value));
+        cards.forEach(c=>{
+          const tags = (c.dataset.tags || '').split(/\s+/).filter(Boolean);
+          const show = value==='all' || tags.includes(value);
+          c.classList.toggle('hidden', !show);
+        });
+      }
+
+      filterBtns.forEach(b=>b.addEventListener('click',()=>applyFilter(b.dataset.filter)));
+      applyFilter(active);
+
+      // If current filter hides all, reset
+      if(cards.every(c=>c.classList.contains('hidden'))) applyFilter('all');
     })();
   </script>
 
