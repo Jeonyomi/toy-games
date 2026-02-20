@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tap2Earn (Toy)</title>
+    <link rel="stylesheet" href="../ui-common.css" />
+    <link rel="stylesheet" href="../shared-nav.css" />
+    <link rel="stylesheet" href="../styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <div class="marquee">🎮 ARCADE :: TAP • SHIELD • REACTION • ASTRO • WORM • LASER • NEON</div>
+      <div class="cabinet-deco" aria-hidden="true">
+        <span class="coin-slot"></span>
+      </div>
+      <header class="top">
+        <div class="top-row">
+          <h1><span class="ico coin" aria-hidden="true"></span> Tap2Earn <span class="ver">v4</span></h1>
+          <div class="top-actions" aria-label="quick actions">
+            <button class="icon-btn" aria-label="Notifications">🔔</button>
+            <button class="icon-btn" aria-label="Wallet">👛</button>
+          </div>
+        </div>
+        <p class="sub">MVP for team-building toy games</p>
+      </header>
+
+      <section class="hero-cta" aria-label="Quick start">
+        <button id="playRandom" class="cta-primary">Play Random Game</button>
+        <button id="browseGames" class="cta-secondary">Browse All Games</button>
+      </section>
+
+      <nav class="universal-actions" aria-label="Universal game actions">
+        <a class="ua-btn" href="../index.html">Home</a>
+        <button class="ua-btn" type="button" data-action="change-game">Change Game</button>
+        <button id="restartPage" class="ua-btn" type="button">Restart</button>
+      </nav>
+
+      <section class="stats">
+        <div><span>Coins</span><strong id="coins">0</strong></div>
+        <div><span>Tap reward</span><strong id="tapPower">1</strong></div>
+        <div><span>Energy</span><strong id="energy">100/100</strong></div>
+        <div><span>Level</span><strong id="level">1</strong></div>
+      </section>
+
+      <nav class="tabs" aria-label="game navigation">
+        <button class="tab active" data-tab="game" aria-controls="game">Game</button>
+        <button class="tab" data-tab="shop" aria-controls="shop">Shop</button>
+      </nav>
+
+      <section id="game" class="panel active">
+        <button id="tapBtn" class="tap-btn">TAP</button>
+        <p id="hint" role="status" aria-live="polite" aria-atomic="true">Tap to earn coins.</p>
+      </section>
+
+      <section id="shop" class="panel">
+        <div class="shop-item">
+          <div>
+            <h3>⚡ Tap Power +1</h3>
+            <p>Increase coins per tap</p>
+          </div>
+          <button id="buyPower">Buy (50)</button>
+        </div>
+        <div class="shop-item">
+          <div>
+            <h3>🔋 Max Energy +20</h3>
+            <p>Increase max energy</p>
+          </div>
+          <button id="buyEnergy">Buy (80)</button>
+        </div>
+      </section>
+
+      <footer>
+        <label class="crt-toggle"><input id="crtToggle" type="checkbox" /> CRT Effect (Visual Only)</label>
+        <button id="reset" class="ghost">Reset</button>
+      </footer>
+    </main>
+
+    <aside id="howtoOverlay" class="howto-overlay" role="dialog" aria-modal="true" aria-labelledby="howtoTitle">
+      <div class="howto-card">
+        <h2 id="howtoTitle">How to play Tap2Earn</h2>
+        <p>Tap the big button to earn coins. Spend coins in Shop to upgrade power and max energy.</p>
+        <p>Level up by total earned coins. Higher levels add challenge with slightly higher energy cost per tap.</p>
+        <div class="howto-actions">
+          <button id="dismissHowto" type="button">Got it</button>
+          <button id="dontShowHowto" type="button" class="ghost-btn">Don't show again</button>
+        </div>
+      </div>
+    </aside>
+
+    <script>
+      (function(){
+        const key='bb_arcade_crt';
+        const wrap=document.querySelector('.app');
+        const t=document.getElementById('crtToggle');
+        const saved=localStorage.getItem(key);
+        const on=saved==='1';
+        if(on){wrap.classList.add('crt-on'); t.checked=true;}
+        t.addEventListener('change',()=>{wrap.classList.toggle('crt-on',t.checked); localStorage.setItem(key,t.checked?'1':'0');});
+
+        document.getElementById('browseGames').addEventListener('click',()=>window.arcadeMenu?.open());
+
+        const links=['../beat-shield/index.html','../reaction-dash/index.html','../astro-dodge/index.html','../worm-tail/index.html','../perfect-stack/index.html','../orbit-defender/index.html','../laser-relay/index.html','../neon-tank/index.html','./index.html'];
+        document.getElementById('playRandom').addEventListener('click',()=>{
+          const pick=links[Math.floor(Math.random()*links.length)];
+          location.href=pick;
+        });
+
+        document.getElementById('restartPage').addEventListener('click',()=>location.reload());
+
+        const helpKey='bb_howto_seen_tap2earn';
+        const overlay=document.getElementById('howtoOverlay');
+        const hide=()=>overlay.classList.add('hidden');
+        if(localStorage.getItem(helpKey)==='1') hide();
+        document.getElementById('dismissHowto').addEventListener('click',hide);
+        document.getElementById('dontShowHowto').addEventListener('click',()=>{localStorage.setItem(helpKey,'1');hide();});
+      })();
+    </script>
+    <script src="../shared-nav.js"></script>
+    <script src="../app.js"></script>
+  </body>
+</html>

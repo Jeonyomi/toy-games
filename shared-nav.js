@@ -1,6 +1,6 @@
 (() => {
   const games = [
-    { href: '/index.html', name: 'Tap2Earn', meta: 'Easy · 2 min · 1P' },
+    { href: '/tap2earn/index.html', name: 'Tap2Earn', meta: 'Easy · 2 min · 1P' },
     { href: '/beat-shield/index.html', name: 'Beat Shield', meta: 'Medium · 3 min · 1P' },
     { href: '/reaction-dash/index.html', name: 'Reaction Dash', meta: 'Easy · 1 min · 1P' },
     { href: '/astro-dodge/index.html', name: 'Astro Dodge', meta: 'Medium · 2 min · 1P' },
