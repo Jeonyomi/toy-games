@@ -7,7 +7,8 @@
     { href: '/worm-tail/index.html', name: 'Worm Tail', meta: 'Medium · 4 min · 1P' },
     { href: '/perfect-stack/index.html', name: 'Perfect Stack', meta: 'Easy · 2 min · 1P' },
     { href: '/orbit-defender/index.html', name: 'Orbit Defender', meta: 'Medium · 3 min · 1P' },
-    { href: '/laser-relay/index.html', name: 'Laser Relay', meta: 'Puzzle · 3 min · 1P' }
+    { href: '/laser-relay/index.html', name: 'Laser Relay', meta: 'Puzzle · 3 min · 1P' },
+    { href: '/neon-tank/index.html', name: 'Neon Tank', meta: 'Arcade · 3 min · 1P' }
   ];
 
   const root = document.querySelector('.app, .wrap');

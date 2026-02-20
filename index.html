@@ -10,7 +10,7 @@
   </head>
   <body>
     <main class="app">
-      <div class="marquee">🎮 ARCADE :: TAP • SHIELD • REACTION • ASTRO • WORM • LASER</div>
+      <div class="marquee">🎮 ARCADE :: TAP • SHIELD • REACTION • ASTRO • WORM • LASER • NEON</div>
       <div class="cabinet-deco" aria-hidden="true">
         <span class="coin-slot"></span>
       </div>
@@ -100,7 +100,7 @@
 
         document.getElementById('browseGames').addEventListener('click',()=>window.arcadeMenu?.open());
 
-        const links=['./beat-shield/index.html','./reaction-dash/index.html','./astro-dodge/index.html','./worm-tail/index.html','./perfect-stack/index.html','./orbit-defender/index.html','./laser-relay/index.html','./index.html'];
+        const links=['./beat-shield/index.html','./reaction-dash/index.html','./astro-dodge/index.html','./worm-tail/index.html','./perfect-stack/index.html','./orbit-defender/index.html','./laser-relay/index.html','./neon-tank/index.html','./index.html'];
         document.getElementById('playRandom').addEventListener('click',()=>{
           const pick=links[Math.floor(Math.random()*links.length)];
           location.href=pick;

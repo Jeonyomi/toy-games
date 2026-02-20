@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neon Tank vs Matrix Girls</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&display=swap');
+
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: #000;
+      font-family: 'Orbitron', sans-serif;
+      color: white;
+      user-select: none;
+    }
+
+    #ui {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      pointer-events: none;
+      z-index: 10;
+      text-shadow: 0 0 10px #0ff;
+    }
+
+    #score {
+      font-size: 32px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: #0ff;
+    }
+
+    #energy-bar-container {
+      width: 300px;
+      height: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid #f0f;
+      margin-top: 10px;
+      box-shadow: 0 0 10px #f0f, inset 0 0 10px rgba(255, 0, 255, 0.5);
+    }
+
+    #energy-bar {
+      width: 0%;
+      height: 100%;
+      background: #f0f;
+      box-shadow: 0 0 20px #f0f;
+      transition: width 0.1s;
+    }
+
+    #special-ready {
+      color: #ff0;
+      font-size: 20px;
+      margin-top: 5px;
+      display: none;
+      animation: blink 0.5s infinite alternate;
+      text-shadow: 0 0 10px #ff0;
+    }
+
+    @keyframes blink {
+      from {
+        opacity: 1;
+      }
+
+      to {
+        opacity: 0;
+      }
+    }
+
+    #game-over {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      display: none;
+      z-index: 20;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 50px;
+      border: 2px solid #f00;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 50px #f00;
+    }
+
+    #game-over h1 {
+      margin: 0 0 10px 0;
+      font-size: 64px;
+      color: #f00;
+      text-shadow: 0 0 30px #f00;
+      letter-spacing: 5px;
+    }
+
+    #game-over p {
+      font-size: 28px;
+      margin-bottom: 30px;
+      color: #fff;
+    }
+
+    #restart-btn {
+      background: transparent;
+      border: 2px solid #0ff;
+      color: #0ff;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 24px;
+      padding: 15px 40px;
+      cursor: pointer;
+      text-transform: uppercase;
+      font-weight: 900;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 15px #0ff inset, 0 0 15px #0ff;
+    }
+
+    #restart-btn:hover {
+      background: #0ff;
+      color: #000;
+      box-shadow: 0 0 40px #0ff, 0 0 20px #0ff inset;
+      transform: scale(1.1);
+    }
+
+    #instructions {
+      position: absolute;
+      bottom: 20px;
+      width: 100%;
+      text-align: center;
+      font-size: 18px;
+      color: rgba(255, 255, 255, 0.8);
+      pointer-events: none;
+      letter-spacing: 2px;
+      text-shadow: 0 0 5px #000;
+    }
+
+    .key {
+      color: #0ff;
+      font-weight: 900;
+      text-shadow: 0 0 8px #0ff;
+    }
+
+    .spec {
+      color: #f0f;
+      font-weight: 900;
+      text-shadow: 0 0 8px #f0f;
+    }
+
+    #flash {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: white;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+    }
+  </style>
+  <!-- Import Maps -->
+  <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+
+<body>
+  <div id="flash"></div>
+  <div id="ui">
+    <div id="score">SCORE: 0</div>
+    <div id="energy-bar-container">
+      <div id="energy-bar"></div>
+    </div>
+    <div id="special-ready">ULTIMATE READY! PRESS [Z]</div>
+  </div>
+
+  <div id="game-over">
+    <h1>TANK DOWN</h1>
+    <p>Final Score: <span id="final-score" style="font-weight: 900; color: #0ff;">0</span></p>
+    <button id="restart-btn">Restart System</button>
+  </div>
+
+  <div id="instructions">
+    <span class="key">[ARROWS]</span> Move | <span class="key">[SPACE]</span> Jump | <span class="key">[X]</span> Shoot
+    | <span class="spec">[Z]</span> ULTIMATE CANNON
+  </div>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+    import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+    import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+    // 1. Core Scene Setup
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x000000, 0.015);
+
+    const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 8, 16);
+    let cameraTarget = new THREE.Vector3(0, 0, -10);
+    camera.lookAt(cameraTarget);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: "high-performance" });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    document.body.appendChild(renderer.domElement);
+
+    // 2. Post Processing (Bloom)
+    const renderScene = new RenderPass(scene, camera);
+    const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
+    bloomPass.threshold = 0;
+    bloomPass.strength = 1.2;
+    bloomPass.radius = 0.5;
+
+    const composer = new EffectComposer(renderer);
+    composer.addPass(renderScene);
+    composer.addPass(bloomPass);
+
+    // 3. Environment (Synthwave floor + particles)
+    const gridGroup = new THREE.Group();
+    const gridHelper = new THREE.GridHelper(400, 100, 0x00ffff, 0xff00ff);
+    gridHelper.position.y = -0.5;
+    gridGroup.add(gridHelper);
+
+    const groundGeo = new THREE.PlaneGeometry(400, 400);
+    const groundMat = new THREE.MeshBasicMaterial({ color: 0x050010, side: THREE.DoubleSide });
+    const ground = new THREE.Mesh(groundGeo, groundMat);
+    ground.rotation.x = Math.PI / 2;
+    ground.position.y = -0.55;
+    gridGroup.add(ground);
+    scene.add(gridGroup);
+
+    // Floating particles
+    const particleGeo = new THREE.BufferGeometry();
+    const pCount = 2000;
+    const pPos = new Float32Array(pCount * 3);
+    for (let i = 0; i < pCount * 3; i++) {
+      pPos[i] = (Math.random() - 0.5) * 200;
+    }
+    particleGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+    const particleMat = new THREE.PointsMaterial({ color: 0x00ffff, size: 0.1, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending });
+    const particles = new THREE.Points(particleGeo, particleMat);
+    scene.add(particles);
+
+    // 4. The Player (Cyber Tank)
+    const tank = new THREE.Group();
+
+    // Body
+    const bodyGeo = new THREE.BoxGeometry(2.4, 1.2, 4);
+    const hullMat = new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.9, roughness: 0.1 });
+    const body = new THREE.Mesh(bodyGeo, hullMat);
+    body.position.y = 0.6;
+    tank.add(body);
+
+    // Neon Strips on Body
+    const stripGeo = new THREE.BoxGeometry(2.5, 0.1, 4.1);
+    const stripMat = new THREE.MeshBasicMaterial({ color: 0x00ffff });
+    const strip = new THREE.Mesh(stripGeo, stripMat);
+    strip.position.y = 0.2;
+    tank.add(strip);
+
+    // Turret
+    const turretGeo = new THREE.BoxGeometry(1.6, 1.0, 2);
+    const turretMat = new THREE.MeshStandardMaterial({ color: 0x333333, metalness: 0.8 });
+    const turret = new THREE.Mesh(turretGeo, turretMat);
+    turret.position.y = 1.7;
+    turret.position.z = 0.5;
+    tank.add(turret);
+
+    // Turret Cannon
+    const cannonGeo = new THREE.CylinderGeometry(0.2, 0.3, 3);
+    cannonGeo.rotateX(Math.PI / 2);
+    const cannonMat = new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 1 });
+    const cannon = new THREE.Mesh(cannonGeo, cannonMat);
+    cannon.position.set(0, 1.7, -1.5);
+    tank.add(cannon);
+
+    // Neon Cannon ring
+    const cannonLightGeo = new THREE.TorusGeometry(0.3, 0.05, 8, 16);
+    const cannonLightMat = new THREE.MeshBasicMaterial({ color: 0xff00ff });
+    const cannonLight = new THREE.Mesh(cannonLightGeo, cannonLightMat);
+    cannonLight.position.set(0, 1.7, -3);
+    tank.add(cannonLight);
+
+    scene.add(tank);
+    tank.position.y = 0;
+
+    const basePlayerY = 0;
+    const playerBox = new THREE.Box3();
+
+    // 5. Enemies (Cute Girls) via SVG
+    const svgContent = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+          <!-- Body -->
+          <path d="M 30 90 l -10 10 h 60 l -10 -10 v -30 h -40 z" fill="#ff00ff" />
+          <!-- Dress highlights -->
+          <path d="M 40 60 h 20 v 30 h -20 z" fill="#ff66ff" />
+
+          <!-- Face -->
+          <circle cx="50" cy="40" r="22" fill="#ffe0c8" />
+          <!-- Eyes - Cyber Demon Red -->
+          <ellipse cx="40" cy="40" rx="4" ry="6" fill="#f00" />
+          <ellipse cx="60" cy="40" rx="4" ry="6" fill="#f00" />
+          <!-- Cheek Blush -->
+          <circle cx="35" cy="46" r="3" fill="#ff9999" opacity="0.8" />
+          <circle cx="65" cy="46" r="3" fill="#ff9999" opacity="0.8" />
+          <!-- Mouth -->
+          <path d="M 46 48 q 4 5 8 0" stroke="#f00" stroke-width="2" fill="none" />
+
+          <!-- Hair - Wild Cyber Blue -->
+          <path d="M 20 40 c 0 -40, 60 -40, 60 0 v 30 h -10 v -30 c 0 -20, -40 -20, -40 0 v 30 h -10 z" fill="#00ffff" />
+          <!-- Hair buns -->
+          <circle cx="20" cy="25" r="12" fill="#0ff" />
+          <circle cx="80" cy="25" r="12" fill="#0ff" />
+        </svg>
+        `;
+    const girlUrl = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svgContent);
+    const girlTexture = new THREE.TextureLoader().load(girlUrl);
+    const enemyMaterial = new THREE.SpriteMaterial({ map: girlTexture });
+
+    // Storage
+    const enemies = [];
+    const missiles = [];
+    const enemyBox = new THREE.Box3();
+    const missileBox = new THREE.Box3();
+
+    // 6. Lights
+    const light = new THREE.AmbientLight(0x404040, 2);
+    scene.add(light);
+    const dirLight = new THREE.DirectionalLight(0xffffff, 3);
+    dirLight.position.set(10, 20, 10);
+    scene.add(dirLight);
+
+    // 7. Inputs
+    const keys = { left: false, right: false, x: false, z: false };
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = true;
+      if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = true;
+      if (e.code === 'Space' && !isJumping && !isGameOver) {
+        playerVelY = jumpPower; isJumping = true;
+      }
+      if (e.code === 'KeyX' && !keys.x) { shootMissile(); keys.x = true; }
+      if (e.code === 'KeyZ' && !keys.z) { triggerUltimate(); keys.z = true; }
+    });
+    window.addEventListener('keyup', (e) => {
+      if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = false;
+      if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = false;
+      if (e.code === 'KeyX') keys.x = false;
+      if (e.code === 'KeyZ') keys.z = false;
+    });
+
+    // 8. Game State
+    let isGameOver = false;
+    let score = 0;
+    let energy = 0;
+    let speed = 0.8;
+
+    // Jump state
+    let playerVelY = 0;
+    let isJumping = false;
+    const gravity = -0.02;
+    const jumpPower = 0.4;
+
+    // Camera shake
+    let shakeAmount = 0;
+
+    // UI Elements
+    const scoreEl = document.getElementById('score');
+    const energyBar = document.getElementById('energy-bar');
+    const specReady = document.getElementById('special-ready');
+    const gameOverEl = document.getElementById('game-over');
+    const finalScoreEl = document.getElementById('final-score');
+    const flashEl = document.getElementById('flash');
+
+    function updateUI() {
+      scoreEl.innerText = 'SCORE: ' + score;
+      const ePercent = Math.min(100, (energy / 100) * 100);
+      energyBar.style.width = ePercent + '%';
+      if (energy >= 100) specReady.style.display = 'block';
+      else specReady.style.display = 'none';
+    }
+
+    // 9. Methods
+    function spawnEnemy() {
+      if (isGameOver) return;
+      const enemy = new THREE.Sprite(enemyMaterial);
+      enemy.scale.set(4, 4, 1);
+      enemy.position.x = (Math.random() - 0.5) * 28;
+      enemy.position.y = 2;
+      enemy.position.z = -100 - Math.random() * 40;
+
+      // Hovering enemies
+      enemy.userData.yOffset = Math.random() * Math.PI;
+      enemy.userData.isFlying = Math.random() > 0.7;
+      if (enemy.userData.isFlying) enemy.position.y += 3;
+
+      scene.add(enemy);
+      enemies.push(enemy);
+
+      const rate = Math.max(100, 600 - score * 2);
+      setTimeout(spawnEnemy, rate + Math.random() * 200);
+    }
+    setTimeout(spawnEnemy, 1000);
+
+    function shootMissile() {
+      if (isGameOver) return;
+      const mGeo = new THREE.CylinderGeometry(0.1, 0.1, 1.5, 8);
+      mGeo.rotateX(Math.PI / 2);
+      const mMat = new THREE.MeshBasicMaterial({ color: 0x00ffff });
+      const missile = new THREE.Mesh(mGeo, mMat);
+
+      missile.position.copy(tank.position);
+      missile.position.y += 1.7; // Cannon height
+      missile.position.z -= 3;
+      scene.add(missile);
+      missiles.push({ mesh: missile });
+
+      // Recoil
+      cannon.position.z = -1.0;
+      shakeAmount = 0.2;
+    }
+
+    // Particle System for Explosions
+    const explosionSpheres = [];
+    const exGeo = new THREE.IcosahedronGeometry(1.5, 1);
+    function createExplosion(pos, tColor = 0xff00ff) {
+      const exMat = new THREE.MeshBasicMaterial({ color: tColor, wireframe: true, transparent: true });
+      const exp = new THREE.Mesh(exGeo, exMat);
+      exp.position.copy(pos);
+      scene.add(exp);
+      explosionSpheres.push({ mesh: exp, scale: 1, life: 1.0 });
+      shakeAmount += 0.5;
+    }
+
+    function triggerUltimate() {
+      if (isGameOver || energy < 100) return;
+      energy = 0;
+      updateUI();
+
+      // Grand flash
+      flashEl.style.transition = 'opacity 0.1s';
+      flashEl.style.opacity = 0.8;
+      setTimeout(() => {
+        flashEl.style.transition = 'opacity 1.5s ease-out';
+        flashEl.style.opacity = 0;
+      }, 100);
+
+      // Giant Laser Visual
+      const laserGeo = new THREE.CylinderGeometry(15, 15, 200, 16);
+      laserGeo.rotateX(Math.PI / 2);
+      const laserMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.9 });
+      const giantLaser = new THREE.Mesh(laserGeo, laserMat);
+      giantLaser.position.copy(tank.position);
+      giantLaser.position.z -= 100;
+      scene.add(giantLaser);
+
+      // Screen Shake Extreme
+      shakeAmount = 4.0;
+
+      // Wipe out enemies
+      enemies.forEach(en => {
+        createExplosion(en.position, 0xffffff);
+        scene.remove(en);
+        score += 50;
+      });
+      enemies.length = 0;
+      updateUI();
+
+      // Fade laser out
+      let fade = setInterval(() => {
+        giantLaser.scale.x *= 0.8;
+        giantLaser.scale.y *= 0.8;
+        laserMat.opacity -= 0.05;
+        if (laserMat.opacity <= 0) {
+          scene.remove(giantLaser);
+          clearInterval(fade);
+        }
+      }, 30);
+    }
+
+    document.getElementById('restart-btn').addEventListener('click', () => {
+      isGameOver = false;
+      score = 0; energy = 0; speed = 0.8;
+      tank.position.set(0, 0, 0);
+      isJumping = false; playerVelY = 0;
+      updateUI();
+      gameOverEl.style.display = 'none';
+      camera.position.set(0, 8, 16);
+
+      enemies.forEach(e => scene.remove(e)); enemies.length = 0;
+      missiles.forEach(m => scene.remove(m.mesh)); missiles.length = 0;
+
+      spawnEnemy();
+      animate();
+    });
+
+    // 10. Main Loop
+    function animate() {
+      if (isGameOver) return;
+      requestAnimationFrame(animate);
+
+      // Time / Animation logic
+      const time = Date.now() * 0.005;
+
+      // Tank Movement
+      const movSpeed = 0.4;
+      let tiltTarget = 0;
+      if (keys.left && tank.position.x > -14) { tank.position.x -= movSpeed; tiltTarget = 0.15; }
+      if (keys.right && tank.position.x < 14) { tank.position.x += movSpeed; tiltTarget = -0.15; }
+      tank.rotation.z = THREE.MathUtils.lerp(tank.rotation.z, tiltTarget, 0.1);
+
+      // Tank Jump
+      if (isJumping) {
+        tank.position.y += playerVelY;
+        playerVelY += gravity;
+        tank.rotation.x = playerVelY * -0.2; // Pitch while jumping
+        if (tank.position.y <= basePlayerY) {
+          tank.position.y = basePlayerY;
+          tank.rotation.x = 0;
+          isJumping = false;
+          playerVelY = 0;
+          shakeAmount = 0.3; // Landing shake
+          createExplosion(tank.position, 0x00ffff);
+        }
+      }
+
+      // Cannon Recoil recovery
+      cannon.position.z = THREE.MathUtils.lerp(cannon.position.z, -1.5, 0.1);
+
+      // Grid scroll
+      gridGroup.position.z += speed;
+      if (gridGroup.position.z > 10) gridGroup.position.z -= 10;
+
+      // Particles motion
+      const positions = particleGeo.attributes.position.array;
+      for (let i = 1; i < pCount * 3; i += 3) {
+        positions[i - 1] -= 0.02; // x flutter
+        positions[i + 1] += speed * 2; // z move towards screen
+        if (positions[i + 1] > 20) {
+          positions[i + 1] = -180;
+          positions[i] = (Math.random() * 20) - 5;
+        }
+      }
+      particleGeo.attributes.position.needsUpdate = true;
+
+      // Camera Shake
+      if (shakeAmount > 0) {
+        camera.position.x = (Math.random() - 0.5) * shakeAmount;
+        camera.position.y = 8 + (Math.random() - 0.5) * shakeAmount;
+        shakeAmount *= 0.9;
+        if (shakeAmount < 0.01) shakeAmount = 0;
+      } else {
+        camera.position.x = 0; camera.position.y = 8;
+      }
+
+      playerBox.setFromObject(tank);
+      playerBox.expandByScalar(-0.6); // Forgiving hitbox
+
+      // Missiles Logic
+      for (let i = missiles.length - 1; i >= 0; i--) {
+        const m = missiles[i];
+        m.mesh.position.z -= 3.0; // very fast
+        missileBox.setFromObject(m.mesh);
+
+        let hit = false;
+        for (let eIdx = enemies.length - 1; eIdx >= 0; eIdx--) {
+          const en = enemies[eIdx];
+          enemyBox.setFromObject(en);
+          if (missileBox.intersectsBox(enemyBox)) {
+            createExplosion(en.position, 0xff00ff);
+            scene.remove(en);
+            enemies.splice(eIdx, 1);
+            hit = true;
+            score += 30;
+            energy = Math.min(100, energy + 5); // Add energy
+            updateUI();
+            break;
+          }
+        }
+        if (hit || m.mesh.position.z < -100) {
+          scene.remove(m.mesh);
+          missiles.splice(i, 1);
+        }
+      }
+
+      // Enemies Logic
+      for (let i = enemies.length - 1; i >= 0; i--) {
+        const en = enemies[i];
+        en.position.z += speed * 1.2;
+        // Hover effect
+        if (en.userData.isFlying) en.position.y = 5 + Math.sin(time + en.userData.yOffset) * 2;
+        else en.position.y = 2 + Math.abs(Math.sin(time * 2 + en.userData.yOffset)) * 0.5; // bouncing walk
+
+        enemyBox.setFromObject(en);
+        enemyBox.expandByScalar(-0.8);
+
+        if (playerBox.intersectsBox(enemyBox)) {
+          isGameOver = true;
+          finalScoreEl.innerText = score;
+          gameOverEl.style.display = 'block';
+          createExplosion(tank.position, 0xff0000);
+          shakeAmount = 2.0;
+          break;
+        }
+
+        if (en.position.z > 20) {
+          scene.remove(en);
+          enemies.splice(i, 1);
+        }
+      }
+
+      // Passive energy gain and score
+      if (Math.random() < 0.05) score++;
+      if (Math.random() < 0.1) {
+        energy = Math.min(100, energy + 0.1);
+        updateUI();
+      }
+
+      // Handle explosions
+      for (let i = explosionSpheres.length - 1; i >= 0; i--) {
+        const exp = explosionSpheres[i];
+        exp.scale += 0.3;
+        exp.mesh.scale.set(exp.scale, exp.scale, exp.scale);
+        exp.life -= 0.05;
+        exp.mesh.material.opacity = exp.life;
+        if (exp.life <= 0) {
+          scene.remove(exp.mesh);
+          explosionSpheres.splice(i, 1);
+        }
+      }
+
+      // Increase difficulty
+      if (score > 0 && score % 1000 === 0) speed += 0.05;
+
+      // Render via composer for Bloom
+      composer.render();
+    }
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      composer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    animate();
+  </script>
+</body>
+
+</html>
